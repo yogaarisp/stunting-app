@@ -9,7 +9,7 @@ export function createClient() {
   }
 
   return createBrowserClient(
-    url || '',
-    key || ''
+    url || 'https://placeholder.supabase.co',
+    key || 'placeholder'
   );
 }

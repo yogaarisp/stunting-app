@@ -11,8 +11,8 @@ export async function createClient() {
   }
 
   return createServerClient(
-    url || '',
-    key || '',
+    url || 'https://placeholder.supabase.co',
+    key || 'placeholder',
     {
       cookies: {
         getAll() {
