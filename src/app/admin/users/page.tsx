@@ -5,8 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Search, Loader2, ArrowLeft, Users, Mail, Clock, Edit2, Trash2, X, AlertCircle, Shield, User, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Profile } from '@/lib/types';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { Profile } from '@/lib/types';
+import { adminCreateUser } from './actions';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -129,47 +128,25 @@ export default function AdminUsers() {
     setActionLoading(true);
     setError('');
     
-    // Create an isolated client so the admin doesn't get logged out
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    const isolatedClient = createSupabaseClient(supabaseUrl, supabaseKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
+    const result = await adminCreateUser({
+      addName,
+      addEmail,
+      addPassword,
+      addRole
     });
 
-    const { data: authData, error: signUpError } = await isolatedClient.auth.signUp({
-      email: addEmail,
-      password: addPassword,
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
+    if (result.error) {
+      setError(result.error);
       setActionLoading(false);
-      return;
+    } else {
+      setIsAddModalOpen(false);
+      setAddName('');
+      setAddEmail('');
+      setAddPassword('');
+      setAddRole('user');
+      await fetchUsers();
+      setActionLoading(false);
     }
-
-    if (authData.user) {
-      const primarySupabase = createClient();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // wait for trigger
-      
-      const { error: profileError } = await primarySupabase
-        .from('profiles')
-        .update({ full_name: addName, role: addRole })
-        .eq('id', authData.user.id);
-        
-      if (profileError) {
-        setError("Akun dibuat, tapi gagal set profil: " + profileError.message);
-        setActionLoading(false);
-        return;
-      }
-    }
-
-    setIsAddModalOpen(false);
-    setAddName('');
-    setAddEmail('');
-    setAddPassword('');
-    setAddRole('user');
-    await fetchUsers();
-    setActionLoading(false);
   };
 
   if (loading) return (
@@ -195,29 +172,34 @@ export default function AdminUsers() {
           </h1>
           <p className="text-surface-500 mt-1 max-w-md">Kelola hak akses dan informasi profil orang tua secara terpusat.</p>
         </div>
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          className="btn-primary shrink-0 w-full md:w-auto justify-center"
-        >
-          <Plus size={20} /> Tambah Pengguna Baru
-        </button>
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animate-delay-100">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-300 pointer-events-none" size={18} />
-          <input 
-            type="text"
-            placeholder="Cari berdasarkan nama atau email..."
-            className="form-input !pl-12 !py-3.5 shadow-sm hover:border-primary-200 transition-colors"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="flex flex-col md:flex-row gap-4 animate-fade-in-up animate-delay-100">
+        <div className="flex gap-2 flex-1 max-w-2xl">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-300 pointer-events-none" size={18} />
+            <input 
+              type="text"
+              placeholder="Cari berdasarkan nama atau email..."
+              className="form-input !pl-12 !py-3.5 shadow-sm hover:border-primary-200 transition-colors w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="btn-primary !py-3.5 px-4 sm:px-6 shrink-0 flex items-center gap-2 text-sm shadow-lg shadow-primary-500/20"
+            title="Tambah Pengguna"
+          >
+            <Plus size={18} />
+            <span className="hidden sm:inline">Tambah Pengguna</span>
+          </button>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-surface-100 rounded-xl text-surface-600 text-sm font-bold">
+
+        <div className="flex items-center gap-2 px-4 py-2 bg-surface-100 rounded-xl text-surface-600 text-sm font-bold w-fit">
           <span className="w-2 h-2 rounded-full bg-green-500" />
-          {users.length} Total Pengguna
+          {users.length} <span className="hidden sm:inline">Total</span> Pengguna
         </div>
       </div>
 

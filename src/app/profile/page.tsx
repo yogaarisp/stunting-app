@@ -100,22 +100,33 @@ export default function ProfilePage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { error } = await supabase
+    const { error: profileError } = await supabase
       .from('profiles')
       .update({
         full_name: fullName,
+        email: email,
         phone: phone,
         address: address,
         updated_at: new Date().toISOString()
       })
       .eq('id', user?.id);
 
-    if (error) {
-      setMessage({ type: 'error', text: 'Gagal memperbarui profil: ' + error.message });
+    if (profileError) {
+      setMessage({ type: 'error', text: 'Gagal memperbarui profil: ' + profileError.message });
     } else {
-      setMessage({ type: 'success', text: 'Profil berhasil diperbarui!' });
-      // Clear message after 3 seconds
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      // 2. Update Auth Email if changed
+      if (email !== user?.email) {
+        const { error: authError } = await supabase.auth.updateUser({ email: email });
+        if (authError) {
+          setMessage({ type: 'error', text: 'Profil tersimpan, tapi gagal ubah email auth: ' + authError.message });
+        } else {
+          setMessage({ type: 'success', text: 'Profil diperbarui! Silakan konfirmasi perubahan di email baru Anda.' });
+        }
+      } else {
+        setMessage({ type: 'success', text: 'Profil berhasil diperbarui!' });
+      }
+      // Clear message after 5 seconds
+      setTimeout(() => setMessage({ type: '', text: '' }), 5000);
     }
     setSaving(false);
   };
@@ -226,17 +237,18 @@ export default function ProfilePage() {
 
             <form onSubmit={handleUpdateProfile} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Email (Read-only) */}
-                <div className="space-y-1.5 opacity-70">
-                  <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest px-1">Email Akun (Tetap)</label>
-                  <div className="relative group bg-surface-50 rounded-2xl">
-                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400" />
+                {/* Email Address */}
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest px-1">Email Akun</label>
+                  <div className="relative group">
+                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 group-focus-within:text-primary-500 transition-colors" />
                     <input 
                       type="email"
                       value={email}
-                      disabled
-                      className="form-input !pl-12 !py-4 cursor-not-allowed bg-transparent border-none"
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="form-input !pl-12 !py-4"
                       placeholder="Email Akun"
+                      required
                     />
                   </div>
                 </div>

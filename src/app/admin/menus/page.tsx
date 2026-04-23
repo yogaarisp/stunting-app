@@ -94,24 +94,28 @@ export default function ManageMenus() {
           </Link>
           <h1 className="text-2xl lg:text-3xl font-bold text-surface-800">Kelola <span className="text-amber-600">Menu Makanan</span></h1>
         </div>
-        <button 
-          onClick={() => { setEditingMenu({ kategori: 'normal' }); setIsModalOpen(true); }}
-          className="btn-primary"
-        >
-          <Plus size={20} /> Tambah Menu Baru
-        </button>
       </div>
 
-      {/* Search */}
-      <div className="relative animate-fade-in-up animate-delay-100 max-w-2xl mx-auto md:mx-0">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 pointer-events-none" size={18} />
-        <input 
-          type="text"
-          placeholder="Cari nama menu atau kategori..."
-          className="form-input !pl-12 !py-4 shadow-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      {/* Control Bar */}
+      <div className="flex gap-2 animate-fade-in-up animate-delay-100 max-w-2xl">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 pointer-events-none group-focus-within:text-amber-500 transition-colors" size={18} />
+          <input 
+            type="text"
+            placeholder="Cari nama menu atau kategori..."
+            className="form-input !pl-12 !py-3.5 shadow-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <button 
+          onClick={() => { setEditingMenu({ kategori: 'normal' }); setIsModalOpen(true); }}
+          className="btn-primary !py-3.5 px-4 sm:px-6 shrink-0 flex items-center gap-2 text-sm shadow-lg shadow-primary-500/20"
+          title="Tambah Menu"
+        >
+          <Plus size={18} />
+          <span className="hidden sm:inline">Tambah Menu</span>
+        </button>
       </div>
 
       {/* Desktop Table & Mobile Cards */}
