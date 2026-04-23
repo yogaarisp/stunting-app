@@ -41,7 +41,7 @@ function MenuSlider() {
         Desktop Layout: Grid 3 Columns
       */}
       <div className="
-        flex md:grid gap-4 overflow-x-auto snap-x snap-mandatory pb-6 px-1
+        flex md:grid gap-4 lg:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 px-1
         md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:snap-none md:px-0
         scrollbar-hide
       ">
@@ -156,7 +156,7 @@ export default function HomePage() {
           </div>
         </nav>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-10 pb-16 lg:pt-14 lg:pb-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-10 lg:pt-14 lg:pb-20">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             
             {/* Left Side: Headlines & CTA */}
@@ -257,9 +257,9 @@ export default function HomePage() {
       </header>
 
       {/* Features */}
-      <section className="py-20 px-6">
+      <section className="py-12 lg:py-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 lg:mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-surface-800 mb-4">
               Fitur <span className="gradient-text">Unggulan</span>
             </h2>
@@ -269,7 +269,7 @@ export default function HomePage() {
           </div>
 
           <div className="
-            flex md:grid gap-6 overflow-x-auto snap-x snap-mandatory pb-6 px-1
+            flex md:grid gap-4 lg:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 px-1
             md:grid-cols-3 md:overflow-x-visible md:snap-none md:px-0
             scrollbar-hide
           ">
@@ -312,9 +312,9 @@ export default function HomePage() {
       </section>
 
       {/* Menus Section */}
-      <section className="py-20 px-6 bg-surface-50">
+      <section className="py-12 lg:py-20 px-6 bg-surface-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 lg:mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-surface-800 mb-4">
               Pilihan <span className="gradient-text">Menu Sehat</span>
             </h2>
