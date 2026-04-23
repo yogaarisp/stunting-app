@@ -78,6 +78,17 @@ export default function Sidebar() {
     return () => window.removeEventListener('settingsUpdated', handleSettingsUpdate);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -91,16 +102,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle */}
-      <button
-        id="sidebar-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-xl bg-white/80 backdrop-blur-lg shadow-lg border border-white/30 lg:hidden"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X size={22} /> : <Menu size={22} />}
-      </button>
-
       {/* Overlay */}
       {isOpen && (
         <div
@@ -112,9 +113,8 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-40 h-full w-72
-          bg-white/80 backdrop-blur-xl
-          border-r border-white/30
+          flex flex-col fixed top-0 left-0 z-40 h-full w-72
+          bg-white/80 backdrop-blur-xl border-r border-white/30
           shadow-2xl shadow-primary-500/5
           transition-transform duration-300 ease-in-out
           lg:translate-x-0
@@ -122,7 +122,7 @@ export default function Sidebar() {
         `}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-surface-200/50">
+        <div className="flex items-center gap-3 px-6 py-6 border-b border-surface-200/50 relative">
           <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg shadow-primary-500/30 overflow-hidden">
             {logoUrl ? (
               <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
@@ -134,10 +134,16 @@ export default function Sidebar() {
             <h1 className="text-lg font-bold gradient-text">{brandName}</h1>
             <p className="text-xs text-surface-500 font-medium">Stunting Tracker</p>
           </div>
+          <button 
+            className="absolute right-4 lg:hidden p-2 text-surface-400 hover:text-surface-700 bg-surface-50 rounded-lg"
+            onClick={() => setIsOpen(false)}
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1 px-4 py-6">
+        <nav className="flex flex-col flex-1 overflow-y-auto gap-1 px-4 py-6">
 
           {isLoading ? (
             <div className="space-y-3 px-2 py-4 animate-pulse">
@@ -297,41 +303,94 @@ export default function Sidebar() {
         </nav>
 
         {/* User & Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-surface-200/50 bg-white/50">
-          <Link
-            href="/profile"
-            onClick={() => setIsOpen(false)}
-            className={`
-              flex items-center gap-3 px-3 py-2.5 mb-2 rounded-xl text-sm font-medium transition-all
-              ${pathname === '/profile' 
-                ? 'bg-primary-50 text-primary-700 shadow-sm' 
-                : 'text-surface-600 hover:bg-surface-50 hover:text-primary-600'
-              }
-            `}
-          >
-            <UserIcon size={18} />
-            <span>Profil Saya</span>
-          </Link>
-
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className={`w-9 h-9 rounded-full ${role === 'admin' ? 'bg-gradient-to-br from-surface-600 to-surface-800' : 'bg-gradient-to-br from-primary-400 to-accent-400'} flex items-center justify-center shadow-md`}>
-              <Heart size={16} className="text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-surface-700 truncate">{userName}</p>
-              <p className="text-xs text-surface-400 uppercase font-bold tracking-tighter">{role === 'admin' ? 'Administrator' : 'Orang Tua'}</p>
-            </div>
+        <div className="mt-auto p-4 border-t border-surface-200/50 bg-white/50 pb-24 lg:pb-4">
+          <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-surface-100 shadow-sm">
+            <Link 
+              href="/profile" 
+              onClick={() => setIsOpen(false)} 
+              className="flex items-center gap-3 flex-1 min-w-0 group"
+            >
+              <div className={`w-10 h-10 rounded-xl ${role === 'admin' ? 'bg-gradient-to-br from-surface-600 to-surface-800' : 'bg-gradient-to-br from-primary-400 to-accent-400'} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform`}>
+                <UserIcon size={18} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-surface-700 truncate group-hover:text-primary-600 transition-colors">{userName}</p>
+                <p className="text-[10px] text-surface-400 uppercase font-bold tracking-widest">{role === 'admin' ? 'Admin' : 'Orang Tua'}</p>
+              </div>
+            </Link>
+            
+            <button
+              id="btn-logout"
+              onClick={handleLogout}
+              className="p-3 text-surface-400 hover:text-danger hover:bg-red-50 rounded-xl transition-all"
+              title="Keluar"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
-          <button
-            id="btn-logout"
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-surface-500 hover:text-danger hover:bg-red-50 rounded-xl transition-all duration-200"
-          >
-            <LogOut size={18} />
-            <span>Keluar</span>
-          </button>
         </div>
       </aside>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-surface-200/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:hidden pb-safe">
+        <div className="flex items-center justify-around px-2 py-2">
+          {!isLoading && role !== 'admin' && [
+            { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+            { href: '/input', label: 'Input', icon: ClipboardEdit },
+            { href: '/profile', label: 'Profil', icon: UserIcon },
+          ].map((link) => {
+            const isActive = pathname === link.href;
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex flex-col items-center justify-center py-1 gap-1 transition-colors ${isActive ? 'text-primary-600' : 'text-surface-400 hover:text-surface-600'}`}
+              >
+                <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-primary-50' : 'bg-transparent'}`}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className="text-[10px] font-medium leading-tight">{link.label}</span>
+              </Link>
+            );
+          })}
+          
+          {!isLoading && role === 'admin' && [
+            { href: '/admin', label: 'Ringkasan', icon: LayoutDashboard },
+            { href: '/admin/users', label: 'Pengguna', icon: Users },
+            { href: '/profile', label: 'Profil', icon: UserIcon },
+          ].map((link) => {
+            const isActive = link.href === '/admin' ? pathname === '/admin' : pathname.startsWith(link.href);
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex flex-col items-center justify-center py-1 gap-1 transition-colors ${isActive ? 'text-surface-800' : 'text-surface-400 hover:text-surface-600'}`}
+              >
+                <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-surface-100' : 'bg-transparent'}`}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className="text-[10px] font-medium leading-tight">{link.label}</span>
+              </Link>
+            );
+          })}
+
+          {!isLoading && (
+            <button
+              onClick={() => setIsOpen(true)}
+              className="flex flex-col items-center justify-center py-1 gap-1 transition-colors text-surface-400 hover:text-surface-600"
+            >
+              <div className="p-1.5 rounded-xl transition-colors bg-transparent">
+                <Menu size={20} strokeWidth={2} />
+              </div>
+              <span className="text-[10px] font-medium leading-tight">Menu</span>
+            </button>
+          )}
+        </div>
+      </nav>
     </>
   );
 }

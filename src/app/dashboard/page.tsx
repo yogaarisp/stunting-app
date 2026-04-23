@@ -31,7 +31,6 @@ export default function DashboardPage() {
   const [child, setChild] = useState<Child | null>(null);
   const [history, setHistory] = useState<HistoriPerkembangan[]>([]);
   const [loading, setLoading] = useState(true);
-  const printRef = useRef<HTMLDivElement>(null);
 
   const fetchData = useCallback(async () => {
     const supabase = createClient();
@@ -60,10 +59,6 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   if (loading) {
     return (
@@ -118,7 +113,7 @@ export default function DashboardPage() {
   const RiskIcon = risk.icon;
 
   return (
-    <div ref={printRef} className="p-6 lg:p-8 space-y-8 print-area">
+    <div className="p-6 lg:p-8 space-y-8 print-area">
       {/* Print Header (hidden on screen, shown on print) */}
       <div className="print-header hidden">
         <h1 className="text-xl font-bold">Laporan Perkembangan Anak — NutriTrack</h1>
@@ -137,15 +132,6 @@ export default function DashboardPage() {
             Terakhir diperbarui: {lastUpdate}
           </p>
         </div>
-        {/* Download Button - hidden on print */}
-        <button
-          id="btn-download-report"
-          onClick={handlePrint}
-          className="btn-secondary gap-2 no-print"
-        >
-          <Printer size={18} />
-          <span>Download Ringkasan</span>
-        </button>
       </div>
 
       {/* Risk Alert */}

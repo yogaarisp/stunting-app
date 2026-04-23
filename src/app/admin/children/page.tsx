@@ -81,10 +81,63 @@ export default function AdminChildren() {
         />
       </div>
 
-      {/* Table */}
+      {/* Desktop Table & Mobile Cards */}
       <div className="glass-card overflow-hidden animate-fade-in-up animate-delay-200">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        {/* Mobile View */}
+        <div className="md:hidden flex flex-col divide-y divide-surface-100">
+          {filteredChildren.length === 0 ? (
+            <div className="p-8 text-center text-surface-500 font-medium">
+              Tidak ada data anak yang ditemukan.
+            </div>
+          ) : (
+            filteredChildren.map((child) => {
+              const analisis = analisisPertumbuhan(child);
+              const riskLevel = analisis.riskLevel === 'rendah' ? 'Rendah' : 
+                                analisis.riskLevel === 'sedang' ? 'Sedang' : 'Tinggi';
+              
+              return (
+                <div key={child.id} className="p-5 hover:bg-surface-50 transition-colors">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold uppercase shrink-0">
+                        {child.nama_anak.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-surface-800 leading-tight text-sm truncate">{child.nama_anak}</p>
+                        <p className="text-[11px] text-surface-500 mt-0.5">{child.umur_bulan} Bulan</p>
+                      </div>
+                    </div>
+                    <span className={`badge shrink-0 ${
+                      riskLevel === 'Tinggi' ? 'badge-danger' : 
+                      riskLevel === 'Sedang' ? 'badge-warning' : 'badge-success'
+                    }`}>
+                      {riskLevel === 'Tinggi' ? 'Risiko Tinggi' : 
+                       riskLevel === 'Sedang' ? 'Risiko Sedang' : 'Normal'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-4 p-3 bg-surface-50 rounded-xl border border-surface-100/50">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mb-1">Orang Tua</span>
+                      <span className="text-xs font-bold text-surface-700 truncate max-w-[120px]">{child.profiles?.full_name || 'Tidak Diketahui'}</span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mb-1">Fisik</span>
+                      <div className="flex items-center gap-2 text-xs text-surface-600 font-medium">
+                        <span className="flex items-center gap-1"><Target size={12} className="text-surface-400" /> {child.berat_badan}kg</span>
+                        <span className="flex items-center gap-1"><Activity size={12} className="text-surface-400" /> {child.tinggi_badan}cm</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left min-w-[700px]">
             <thead className="bg-surface-50 border-b border-surface-200">
               <tr>
                 <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase">Nama Anak</th>

@@ -117,10 +117,51 @@ export default function ManageEdukasi() {
         />
       </div>
 
-      {/* Table */}
+      {/* Desktop Table & Mobile Cards */}
       <div className="glass-card overflow-hidden animate-fade-in-up animate-delay-200">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        {/* Mobile View */}
+        <div className="md:hidden flex flex-col divide-y divide-surface-100">
+          {filteredItems.length === 0 ? (
+            <div className="p-8 text-center text-surface-500 font-medium">
+              Tidak ada konten yang ditemukan.
+            </div>
+          ) : (
+            filteredItems.map((item) => (
+              <div key={item.id} className="p-5 hover:bg-surface-50 transition-colors">
+                <div className="flex justify-between items-start gap-4 mb-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <span className={`shrink-0 flex items-center justify-center p-2.5 rounded-xl ${item.tipe === 'video' ? 'bg-red-50 text-red-500 border border-red-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+                      {item.tipe === 'video' ? <PlayCircle size={20} /> : <FileText size={20} />}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-bold text-surface-800 leading-tight mb-1 truncate">{item.judul}</p>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${item.tipe === 'video' ? 'text-red-500' : 'text-emerald-500'}`}>{item.tipe}</span>
+                    </div>
+                  </div>
+                  <div className="flex bg-white shadow-sm border border-surface-100 rounded-xl overflow-hidden shrink-0">
+                    <button onClick={() => { setEditingItem(item); setIsModalOpen(true); }} className="p-2 text-blue-600 hover:bg-blue-50 border-r border-surface-100">
+                      <Edit2 size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(item.id)} className="p-2 text-red-600 hover:bg-red-50">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-surface-500 mb-3 leading-relaxed line-clamp-2">{item.deskripsi}</p>
+                <div className="bg-surface-50 p-3 rounded-xl border border-surface-100/50">
+                  <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest mb-1">Tautan</p>
+                  <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-primary-600 hover:underline truncate block">
+                    {item.link_url}
+                  </a>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left min-w-[700px]">
             <thead className="bg-surface-50 border-b border-surface-200">
               <tr>
                 <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase">Konten</th>
@@ -180,14 +221,20 @@ export default function ManageEdukasi() {
 
       {/* Modal Tool */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-surface-100 flex items-center justify-between">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-2xl h-auto max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
+            <div className="sticky top-0 bg-white px-6 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0">
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-xl transition-all"
+                title="Kembali"
+              >
+                <ArrowLeft size={20} />
+              </button>
               <h2 className="text-xl font-bold text-surface-800">{editingItem?.id ? 'Edit Konten' : 'Tambah Konten Baru'}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-surface-400 hover:text-surface-600"><X size={24} /></button>
             </div>
             
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto">
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="form-label">Tipe Konten</label>

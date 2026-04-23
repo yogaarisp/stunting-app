@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetMessage, setResetMessage] = useState({ type: '', text: '' });
 
   const [brandName, setBrandName] = useState('NutriTrack');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -92,6 +94,24 @@ export default function LoginPage() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setResetMessage({ type: '', text: '' });
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/profile`,
+    });
+
+    if (error) {
+      setResetMessage({ type: 'error', text: error.message });
+    } else {
+      setResetMessage({ type: 'success', text: 'Link reset password telah dikirim ke email Anda!' });
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="relative h-screen min-h-[550px] flex items-center justify-center px-4 overflow-hidden bg-surface-50">
       {/* Decorative Background Elements - Better Balanced */}
@@ -118,8 +138,9 @@ export default function LoginPage() {
         </div>
 
         {/* Login Card - Symmetrical Design */}
-        <div className="glass-card p-8 sm:p-10 shadow-2xl shadow-primary-500/5 animate-fade-in-up animate-delay-100 bg-white/80 w-full border-white/40">
-          <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        <div className="glass-card p-8 sm:p-10 shadow-2xl shadow-primary-500/5 animate-fade-in-up animate-delay-100 bg-white/80 w-full border-white/40 min-h-[380px]">
+          {!isResetMode ? (
+            <form onSubmit={handleLogin} className="flex flex-col gap-5">
             {error && (
               <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2 animate-shake text-center">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -146,7 +167,16 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between px-1">
                 <label htmlFor="password" className="text-[10px] font-bold text-surface-400 uppercase tracking-widest">Password</label>
-                <Link href="#" className="text-[10px] font-bold text-primary-500 hover:text-primary-600 transition-colors">Lupa Password?</Link>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsResetMode(true);
+                    setError('');
+                  }}
+                  className="text-[10px] font-bold text-primary-500 hover:text-primary-600 transition-colors"
+                >
+                  Lupa Password?
+                </button>
               </div>
               <div className="relative group">
                 <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 group-focus-within:text-primary-500 transition-colors" />
@@ -184,6 +214,65 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+          ) : (
+            <form onSubmit={handleResetPassword} className="flex flex-col gap-5 h-full justify-center">
+              <div className="text-center mb-2">
+                <h3 className="text-lg font-bold text-surface-800">Lupa Password?</h3>
+                <p className="text-xs text-surface-500 mt-2">Masukkan email yang terdaftar, kami akan mengirimkan link untuk mereset password Anda.</p>
+              </div>
+
+              {resetMessage.text && (
+                <div className={`p-3 border rounded-xl text-[11px] font-bold flex items-center justify-center gap-2 animate-shake text-center ${
+                  resetMessage.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600'
+                }`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${resetMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+                  {resetMessage.text}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label htmlFor="reset-email" className="text-[10px] font-bold text-surface-400 uppercase tracking-widest px-1">Alamat Email</label>
+                <div className="relative group">
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 group-focus-within:text-primary-500 transition-colors" />
+                  <input
+                    id="reset-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="masukkan@email.com"
+                    className="form-input !pl-11 !py-4 text-sm bg-white/50 border-surface-200 focus:bg-white text-center sm:text-left"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !email}
+                className="btn-primary w-full py-4 text-sm font-bold shadow-lg shadow-primary-500/20 active:scale-[0.98] transition-all mt-2 disabled:opacity-50"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2 justify-center">
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>MENGIRIM LINK...</span>
+                  </div>
+                ) : (
+                  'KIRIM LINK RESET'
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsResetMode(false);
+                  setResetMessage({ type: '', text: '' });
+                }}
+                className="text-xs font-bold text-surface-500 hover:text-surface-700 mt-2 transition-colors py-2"
+              >
+                Kembali ke Login
+              </button>
+            </form>
+          )}
 
           <div className="mt-8 pt-8 border-t border-surface-100 text-center">
             <p className="text-xs text-surface-500 font-medium">

@@ -17,7 +17,8 @@ import {
   EyeOff,
   RefreshCw,
   Baby,
-  Activity
+  Activity,
+  LogOut
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -170,6 +171,12 @@ export default function ProfilePage() {
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     }
     setChildLoading(false);
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
   };
 
   if (loading) return (
@@ -429,6 +436,16 @@ export default function ProfilePage() {
                 <strong>Tips Keamanan:</strong> Gunakan kombinasi huruf, angka, dan simbol untuk password Anda. Jangan bagikan email dan password Anda kepada siapapun.
               </p>
             </div>
+          </div>
+
+          <div className="pt-4 lg:hidden">
+            <button 
+              onClick={handleLogout}
+              className="w-full py-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl text-sm font-bold hover:bg-red-100 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+            >
+              <LogOut size={18} />
+              Keluar dari Akun
+            </button>
           </div>
         </div>
       </div>
