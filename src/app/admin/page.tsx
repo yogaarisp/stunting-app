@@ -37,7 +37,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ users: 0, children: 0, menus: 0, edukasi: 0 });
   const [groupStats, setGroupStats] = useState({ groupA: 0, groupB: 0 });
   const [loading, setLoading] = useState(true);
-  const [recentChildren, setRecentChildren] = useState<any[]>([]);
+  const [recentChildren, setRecentChildren] = useState<{ id: string; nama_anak: string; created_at: string; profiles: { full_name: string | null } }[]>([]);
   const [stuntingStats, setStuntingStats] = useState<StuntingStats>({ normal: 0, sedang: 0, tinggi: 0, total: 0 });
 
   const fetchData = useCallback(async () => {
@@ -92,7 +92,8 @@ export default function AdminDashboard() {
       .order('created_at', { ascending: false })
       .limit(5);
     
-    setRecentChildren(latest || []);
+    // Type cast to handle the join result correctly for TS
+    setRecentChildren((latest as any) || []);
 
     // === FETCH ALL CHILDREN FOR ANALYTICS ===
     const { data: allChildren } = await supabase

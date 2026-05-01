@@ -244,7 +244,7 @@ export default function ManageMenus() {
                   <select 
                     className="form-input"
                     value={editingMenu?.kategori || ''}
-                    onChange={e => setEditingMenu({...editingMenu, kategori: e.target.value as any})}
+                    onChange={e => setEditingMenu({...editingMenu, kategori: e.target.value as 'tinggi_kalori' | 'tinggi_protein' | 'tinggi_kalsium' | 'probiotik' | 'normal' | 'nutrisi_otak'})}
                   >
                     <option value="tinggi_kalori">Tinggi Kalori</option>
                     <option value="tinggi_protein">Tinggi Protein</option>
