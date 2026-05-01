@@ -194,9 +194,9 @@ export default function InputPage() {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Database Error:', err);
-      const message = err.details || err.message || 'Terjadi kesalahan saat menyimpan data.';
+      const message = err instanceof Error ? err.message : 'Terjadi kesalahan saat menyimpan data.';
       setError(message);
     } finally {
       setSaving(false);

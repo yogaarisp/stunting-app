@@ -107,7 +107,7 @@ export default function HomePage() {
       }
     };
     fetchSettings();
-  }, []);
+  }, [router]);
 
   if (checking) {
     return (

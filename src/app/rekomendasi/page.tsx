@@ -145,9 +145,10 @@ export default function RekomendasiPage() {
 
       setAiMenus(data.menus || []);
       setIsCached(data.cached || false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Menu generation error:', err);
-      setError(err.message || 'Gagal menghasilkan menu. Silakan coba lagi.');
+      const message = err instanceof Error ? err.message : 'Gagal menghasilkan menu. Silakan coba lagi.';
+      setError(message);
     } finally {
       setGenerating(false);
     }
@@ -431,7 +432,7 @@ export default function RekomendasiPage() {
         {aiMenus.length === 0 && !generating && !error && (
           <div className="glass-card p-8 text-center">
             <Utensils size={48} className="text-surface-300 mx-auto mb-4" />
-            <p className="text-surface-500">Klik "Generate Ulang" untuk mendapatkan rekomendasi menu.</p>
+            <p className="text-surface-500">Klik &quot;Generate Ulang&quot; untuk mendapatkan rekomendasi menu.</p>
           </div>
         )}
       </div>
