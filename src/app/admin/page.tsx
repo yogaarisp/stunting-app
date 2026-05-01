@@ -35,6 +35,7 @@ const PIE_COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ users: 0, children: 0, menus: 0, edukasi: 0 });
+  const [groupStats, setGroupStats] = useState({ groupA: 0, groupB: 0 });
   const [loading, setLoading] = useState(true);
   const [recentChildren, setRecentChildren] = useState<any[]>([]);
   const [stuntingStats, setStuntingStats] = useState<StuntingStats>({ normal: 0, sedang: 0, tinggi: 0, total: 0 });
@@ -53,6 +54,35 @@ export default function AdminDashboard() {
       children: childrenCount || 0,
       menus: menusCount || 0,
       edukasi: edukasiCount || 0,
+    });
+
+    // Fetch research group distribution
+    const { data: groupAData } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('research_group', 'A')
+      .eq('role', 'user');
+    const { data: groupBData } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('research_group', 'B')
+      .eq('role', 'user');
+    
+    // Use count from response headers (supabase returns count separately)
+    const { count: groupACount } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('research_group', 'A')
+      .eq('role', 'user');
+    const { count: groupBCount } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('research_group', 'B')
+      .eq('role', 'user');
+
+    setGroupStats({
+      groupA: groupACount || 0,
+      groupB: groupBCount || 0,
     });
 
     // Fetch recent children
@@ -170,6 +200,50 @@ export default function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Research Group Stats */}
+      {(groupStats.groupA > 0 || groupStats.groupB > 0) && (
+        <div className="glass-card p-6 animate-fade-in-up animate-delay-100">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+              <Users size={20} className="text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-surface-800">Distribusi Kelompok Penelitian</h2>
+              <p className="text-xs text-surface-500">Pembagian otomatis random A/B (Double Blind)</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/50 rounded-2xl p-5 text-center">
+              <p className="text-3xl font-black text-blue-700">{groupStats.groupA}</p>
+              <p className="text-sm font-bold text-blue-600 mt-1">Kelompok A</p>
+              <p className="text-[10px] text-blue-500 mt-0.5 uppercase tracking-wider font-medium">Mikrobiota</p>
+            </div>
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/50 rounded-2xl p-5 text-center">
+              <p className="text-3xl font-black text-emerald-700">{groupStats.groupB}</p>
+              <p className="text-sm font-bold text-emerald-600 mt-1">Kelompok B</p>
+              <p className="text-[10px] text-emerald-500 mt-0.5 uppercase tracking-wider font-medium">Standar</p>
+            </div>
+          </div>
+          {/* Distribution bar */}
+          <div className="mt-4">
+            <div className="w-full h-3 bg-surface-100 rounded-full overflow-hidden flex">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 transition-all duration-700"
+                style={{ width: `${(groupStats.groupA + groupStats.groupB) > 0 ? (groupStats.groupA / (groupStats.groupA + groupStats.groupB)) * 100 : 50}%` }}
+              />
+              <div 
+                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-700"
+                style={{ width: `${(groupStats.groupA + groupStats.groupB) > 0 ? (groupStats.groupB / (groupStats.groupA + groupStats.groupB)) * 100 : 50}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-[10px] text-blue-500 font-bold">A: {(groupStats.groupA + groupStats.groupB) > 0 ? Math.round((groupStats.groupA / (groupStats.groupA + groupStats.groupB)) * 100) : 0}%</span>
+              <span className="text-[10px] text-emerald-500 font-bold">B: {(groupStats.groupA + groupStats.groupB) > 0 ? Math.round((groupStats.groupB / (groupStats.groupA + groupStats.groupB)) * 100) : 0}%</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* === ANALYTICS SECTION (NEW) === */}
       {stuntingStats.total > 0 && (

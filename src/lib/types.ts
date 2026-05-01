@@ -5,6 +5,7 @@ export interface Profile {
   phone: string | null;
   address: string | null;
   role: 'admin' | 'user';
+  research_group: 'A' | 'B' | null;
   created_at: string;
   updated_at: string;
 }
@@ -21,7 +22,8 @@ export interface Child {
   lingkar_lengan: number | null;
   lingkar_kepala: number | null;
   alergi: string | null;
-  mikrobiota: 'Baik' | 'Cukup' | 'Kurang';
+  has_mikrobiota_data: boolean;
+  mikrobiota: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -60,7 +62,8 @@ export interface ChildFormData {
   lingkar_lengan: number;
   lingkar_kepala: number;
   alergi: string;
-  mikrobiota: 'Baik' | 'Cukup' | 'Kurang';
+  has_mikrobiota_data: boolean;
+  mikrobiota: string;
 }
 
 export interface Edukasi {
@@ -77,4 +80,26 @@ export interface AppSettings {
   brand_name: string;
   logo_url: string | null;
   updated_at: string;
+}
+
+export interface AIGeneratedMenu {
+  nama_menu: string;
+  deskripsi: string;
+  bahan_utama: string[];
+  nutrisi: string;
+  kalori_estimasi: number;
+  protein_estimasi: number;
+  kategori: string;
+  waktu_masak: string;
+}
+
+export interface FoodPhoto {
+  id: string;
+  child_id: string;
+  user_id: string;
+  photo_url: string;
+  caption: string | null;
+  meal_type: 'sarapan' | 'makan_siang' | 'makan_malam' | 'snack';
+  photo_date: string;
+  created_at: string;
 }

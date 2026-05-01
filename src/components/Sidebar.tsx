@@ -19,12 +19,14 @@ import {
   Users,
   User as UserIcon,
   Settings as SettingsIcon,
+  Camera,
 } from 'lucide-react';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/input', label: 'Input Data', icon: ClipboardEdit },
   { href: '/rekomendasi', label: 'Rekomendasi', icon: Utensils },
+  { href: '/food-log', label: 'Log Makanan', icon: Camera },
   { href: '/grafik', label: 'Grafik', icon: BarChart3 },
   { href: '/edukasi', label: 'Edukasi', icon: BookOpen },
 ];

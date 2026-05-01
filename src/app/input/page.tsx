@@ -27,7 +27,8 @@ const initialFormData: ChildFormData = {
   lingkar_lengan: 0,
   lingkar_kepala: 0,
   alergi: '',
-  mikrobiota: 'Baik',
+  has_mikrobiota_data: false,
+  mikrobiota: '',
 };
 
 export default function InputPage() {
@@ -62,7 +63,8 @@ export default function InputPage() {
         lingkar_lengan: data.lingkar_lengan || 0,
         lingkar_kepala: data.lingkar_kepala || 0,
         alergi: data.alergi || '',
-        mikrobiota: data.mikrobiota || 'Baik',
+        has_mikrobiota_data: data.has_mikrobiota_data || false,
+        mikrobiota: data.mikrobiota || '',
       });
     }
     setLoading(false);
@@ -136,7 +138,8 @@ export default function InputPage() {
       lingkar_lengan: formData.lingkar_lengan ? Number(formData.lingkar_lengan) : null,
       lingkar_kepala: formData.lingkar_kepala ? Number(formData.lingkar_kepala) : null,
       alergi: formData.alergi?.trim() || null,
-      mikrobiota: formData.mikrobiota,
+      has_mikrobiota_data: formData.has_mikrobiota_data,
+      mikrobiota: formData.has_mikrobiota_data ? (formData.mikrobiota?.trim() || null) : null,
     };
 
     try {
@@ -431,20 +434,63 @@ export default function InputPage() {
 
           <div className="grid md:grid-cols-2 gap-5">
             <div>
-              <label htmlFor="mikrobiota" className="form-label">Kondisi Mikrobiota Usus *</label>
-              <select
-                id="mikrobiota"
-                name="mikrobiota"
-                value={formData.mikrobiota}
-                onChange={handleChange}
-                className="form-input"
-                required
-              >
-                <option value="Baik">Baik - Pencernaan lancar</option>
-                <option value="Cukup">Cukup - Kadang bermasalah</option>
-                <option value="Kurang">Kurang - Sering bermasalah</option>
-              </select>
+              <label className="form-label">Punya Data Mikrobiota? *</label>
+              <div className="flex gap-4 mt-2">
+                <label className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData.has_mikrobiota_data 
+                    ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm' 
+                    : 'border-surface-200 bg-white text-surface-600 hover:border-surface-300'
+                }`}>
+                  <input
+                    type="radio"
+                    name="has_mikrobiota_data"
+                    checked={formData.has_mikrobiota_data === true}
+                    onChange={() => setFormData(prev => ({ ...prev, has_mikrobiota_data: true }))}
+                    className="sr-only"
+                  />
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    formData.has_mikrobiota_data ? 'border-primary-500' : 'border-surface-300'
+                  }`}>
+                    {formData.has_mikrobiota_data && <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />}
+                  </div>
+                  <span className="text-sm font-semibold">Ya</span>
+                </label>
+                <label className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  !formData.has_mikrobiota_data 
+                    ? 'border-surface-500 bg-surface-50 text-surface-700 shadow-sm' 
+                    : 'border-surface-200 bg-white text-surface-600 hover:border-surface-300'
+                }`}>
+                  <input
+                    type="radio"
+                    name="has_mikrobiota_data"
+                    checked={formData.has_mikrobiota_data === false}
+                    onChange={() => setFormData(prev => ({ ...prev, has_mikrobiota_data: false, mikrobiota: '' }))}
+                    className="sr-only"
+                  />
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    !formData.has_mikrobiota_data ? 'border-surface-500' : 'border-surface-300'
+                  }`}>
+                    {!formData.has_mikrobiota_data && <div className="w-2.5 h-2.5 rounded-full bg-surface-500" />}
+                  </div>
+                  <span className="text-sm font-semibold">Tidak</span>
+                </label>
+              </div>
             </div>
+            {formData.has_mikrobiota_data && (
+              <div className="animate-fade-in-up">
+                <label htmlFor="mikrobiota" className="form-label">Data Mikrobiota</label>
+                <textarea
+                  id="mikrobiota"
+                  name="mikrobiota"
+                  value={formData.mikrobiota}
+                  onChange={handleChange}
+                  placeholder="Contoh: Lactobacillus rendah, Bifidobacterium normal, Firmicutes/Bacteroidetes ratio tinggi"
+                  className="form-input h-20 resize-none"
+                  rows={3}
+                />
+                <p className="text-[10px] text-surface-400 mt-1.5 px-1">Masukkan hasil pemeriksaan mikrobiota usus anak</p>
+              </div>
+            )}
             <div>
               <label htmlFor="alergi" className="form-label">Alergi Makanan</label>
               <input
