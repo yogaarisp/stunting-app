@@ -154,12 +154,7 @@ export default function RekomendasiPage() {
     }
   }, [child, analisis, researchGroup]);
 
-  // Auto-generate when data ready
-  useEffect(() => {
-    if (child && analisis && aiMenus.length === 0 && !generating) {
-      generateMenus();
-    }
-  }, [child, analisis, aiMenus.length, generating, generateMenus]);
+  // Menu generation is now manual — user clicks "Generate Menu" button
 
   // Cooking guide handler
   const handleCookingGuide = async (menu: AIGeneratedMenu) => {
@@ -428,11 +423,23 @@ export default function RekomendasiPage() {
           </div>
         )}
 
-        {/* No menus and not generating */}
+        {/* No menus — show generate CTA */}
         {aiMenus.length === 0 && !generating && !error && (
-          <div className="glass-card p-8 text-center">
-            <Utensils size={48} className="text-surface-300 mx-auto mb-4" />
-            <p className="text-surface-500">Klik &quot;Generate Ulang&quot; untuk mendapatkan rekomendasi menu.</p>
+          <div className="glass-card p-12 text-center animate-fade-in-up">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-100 to-accent-100 mb-6">
+              <Sparkles size={40} className="text-primary-600" />
+            </div>
+            <h3 className="text-xl font-bold text-surface-800 mb-2">Siap Generate Menu AI</h3>
+            <p className="text-surface-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+              Klik tombol di bawah untuk menghasilkan rekomendasi menu makanan yang dipersonalisasi berdasarkan kondisi {child.nama_anak}.
+            </p>
+            <button
+              onClick={() => generateMenus(false)}
+              className="btn-primary px-8 py-3.5 text-base flex items-center gap-2 mx-auto shadow-lg shadow-primary-500/20"
+            >
+              <Sparkles size={20} />
+              Generate Menu Sekarang
+            </button>
           </div>
         )}
       </div>
