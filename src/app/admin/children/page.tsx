@@ -56,7 +56,7 @@ export default function AdminChildren() {
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in-up">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-fade-in-up">
         <div>
           <Link href="/admin" className="text-sm font-medium text-surface-500 hover:text-primary-600 flex items-center gap-1 mb-2">
             <ArrowLeft size={16} /> Kembali ke Admin
@@ -67,6 +67,14 @@ export default function AdminChildren() {
           </h1>
           <p className="text-surface-500 mt-1">Pantau perkembangan seluruh anak terdaftar di sistem.</p>
         </div>
+        
+        <Link 
+          href="/admin/children/input"
+          className="btn-primary flex items-center gap-2 px-6 py-3 shadow-lg shadow-primary-500/20 w-fit"
+        >
+          <Baby size={20} />
+          Input Data Anak
+        </Link>
       </div>
 
       {/* Search */}
