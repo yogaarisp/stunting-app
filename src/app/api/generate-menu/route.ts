@@ -28,7 +28,14 @@ interface MenuRequest {
   forceRefresh?: boolean;
 }
 
-function buildMenuPrompt(data: MenuRequest): string {
+interface MicrobiotaRule {
+  nama_bakteri: string;
+  makanan_disarankan: string | null;
+  makanan_dihindari: string | null;
+  penjelasan_medis: string | null;
+}
+
+function buildMenuPrompt(data: MenuRequest, microbiotaRules: MicrobiotaRule[] = []): string {
   const { childData, researchGroup, analisisResult } = data;
 
   const kebutuhanLabels: Record<string, string> = {
@@ -60,6 +67,19 @@ DATA ANAK:
   if (researchGroup === 'A' && childData.has_mikrobiota_data && childData.mikrobiota) {
     prompt += `\n- Data Mikrobiota Usus: ${childData.mikrobiota}`;
     prompt += `\n- Berdasarkan data mikrobiota di atas, sesuaikan rekomendasi menu untuk mendukung keseimbangan mikrobiota usus anak.`;
+  }
+
+  // === KNOWLEDGE BASE: Aturan Referensi Mikrobiota dari Database ===
+  if (researchGroup === 'A' && microbiotaRules.length > 0) {
+    prompt += `\n\n=== KNOWLEDGE BASE MIKROBIOTA (dari Tim Riset) ===`;
+    prompt += `\nGunakan aturan berikut sebagai acuan utama dalam menyusun menu. Cocokkan dengan data mikrobiota anak di atas:`;
+    microbiotaRules.forEach((rule, idx) => {
+      prompt += `\n\n[Aturan ${idx + 1}] ${rule.nama_bakteri}:`;
+      if (rule.makanan_disarankan) prompt += `\n  ✅ Makanan disarankan: ${rule.makanan_disarankan}`;
+      if (rule.makanan_dihindari) prompt += `\n  ❌ Makanan dihindari: ${rule.makanan_dihindari}`;
+      if (rule.penjelasan_medis) prompt += `\n  📋 Penjelasan: ${rule.penjelasan_medis}`;
+    });
+    prompt += `\n\nPENTING: Prioritaskan makanan yang disarankan dan HINDARI makanan yang tercantum di daftar "dihindari" berdasarkan kondisi mikrobiota anak.`;
   }
 
   prompt += `\n\nKEBUTUHAN NUTRISI: ${kebutuhan}
@@ -134,8 +154,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Fetch aturan mikrobiota dari database (Knowledge Base dinamis)
+    let microbiotaRules: MicrobiotaRule[] = [];
+    if (body.researchGroup === 'A') {
+      const { data: rules } = await supabase
+        .from('microbiota_references')
+        .select('nama_bakteri, makanan_disarankan, makanan_dihindari, penjelasan_medis');
+      microbiotaRules = rules || [];
+    }
+
     // Generate via Gemini
-    const prompt = buildMenuPrompt(body);
+    const prompt = buildMenuPrompt(body, microbiotaRules);
     const rawResponse = await callGemini(prompt);
     const menus = parseGeminiJSON<any[]>(rawResponse);
 

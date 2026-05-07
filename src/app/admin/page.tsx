@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
+  Dna,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -401,6 +402,19 @@ export default function AdminDashboard() {
               <div>
                 <h4 className="font-bold text-surface-800">Materi Edukasi</h4>
                 <p className="text-xs text-surface-500 mt-1">Publikasikan artikel dan panduan stunting bagi orang tua.</p>
+              </div>
+            </Link>
+
+            <Link href="/admin/microbiota" className="glass-card p-6 flex flex-col gap-4 group border-violet-100 hover:bg-violet-50/3 transition-all">
+              <div className="flex justify-between items-center">
+                <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600">
+                  <Dna size={24} />
+                </div>
+                <ArrowRight size={20} className="text-violet-300 group-hover:translate-x-1 transition-transform" />
+              </div>
+              <div>
+                <h4 className="font-bold text-surface-800">Aturan Mikrobiota</h4>
+                <p className="text-xs text-surface-500 mt-1">Kelola aturan referensi bakteri usus untuk rekomendasi AI.</p>
               </div>
             </Link>
 

@@ -271,6 +271,22 @@ export default function Sidebar() {
                     <BookOpen size={20} />
                     <span>Kelola Edukasi</span>
                   </Link>
+
+                  <Link
+                    href="/admin/microbiota"
+                    onClick={() => setIsOpen(false)}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      text-sm font-medium transition-all duration-200
+                      ${pathname.startsWith('/admin/microbiota')
+                        ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
+                        : 'text-surface-600 hover:bg-surface-100 hover:text-surface-900'
+                      }
+                    `}
+                  >
+                    <Heart size={20} />
+                    <span>Aturan Mikrobiota</span>
+                  </Link>
                   
                   <Link
                     href="/admin/settings"

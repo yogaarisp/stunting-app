@@ -103,3 +103,13 @@ export interface FoodPhoto {
   photo_date: string;
   created_at: string;
 }
+
+export interface MicrobiotaReference {
+  id: string;
+  nama_bakteri: string;
+  makanan_disarankan: string | null;
+  makanan_dihindari: string | null;
+  penjelasan_medis: string | null;
+  created_at: string;
+  updated_at: string;
+}
