@@ -53,6 +53,7 @@ export default function RekomendasiPage() {
   const [child, setChild] = useState<Child | null>(null);
   const [researchGroup, setResearchGroup] = useState<string | null>(null);
   const [aiMenus, setAiMenus] = useState<AIGeneratedMenu[]>([]);
+  const [databaseMenus, setDatabaseMenus] = useState<any[]>([]);
   const [analisis, setAnalisis] = useState<AnalisisStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -92,9 +93,44 @@ export default function RekomendasiPage() {
       setChild(childData);
       const analisisResult = analisisPertumbuhan(childData, profile?.research_group);
       setAnalisis(analisisResult);
+      
+      // Fetch database menus based on criteria
+      await fetchDatabaseMenus(analisisResult.kategoriRekomendasi, childData.umur_bulan);
     }
     setLoading(false);
   }, []);
+
+  // Fetch menus from database based on criteria
+  const fetchDatabaseMenus = async (kategoriRekomendasi: string[], umurBulan: number) => {
+    const supabase = createClient();
+    
+    try {
+      // Build query for matching categories
+      let query = supabase
+        .from('menus')
+        .select('*')
+        .lte('min_umur_bulan', umurBulan)
+        .gte('max_umur_bulan', umurBulan);
+
+      // Filter by categories (OR condition for multiple categories)
+      if (kategoriRekomendasi.length > 0) {
+        query = query.or(
+          kategoriRekomendasi.map(kategori => `kategori.eq.${kategori}`).join(',')
+        );
+      }
+
+      const { data: menus, error } = await query.limit(6);
+
+      if (error) {
+        console.error('Error fetching database menus:', error);
+        return;
+      }
+
+      setDatabaseMenus(menus || []);
+    } catch (err) {
+      console.error('Failed to fetch database menus:', err);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -300,11 +336,104 @@ export default function RekomendasiPage() {
         </div>
       )}
 
+      {/* Database Menu Section - Muncul Otomatis */}
+      {databaseMenus.length > 0 && (
+        <div className="animate-fade-in-up animate-delay-200">
+          <div className="flex items-center gap-3 mb-5">
+            <h2 className="text-xl font-bold text-surface-800">Menu Rekomendasi <span className="gradient-text">Database</span></h2>
+            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">Otomatis</span>
+          </div>
+          <p className="text-surface-500 text-sm mb-6">Menu yang sesuai dengan kriteria {child.nama_anak} berdasarkan database kami.</p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {databaseMenus.map((menu, index) => {
+              const config = kategoriConfig[menu.kategori] || kategoriConfig.normal;
+              const Icon = config?.icon || Utensils;
+              return (
+                <div
+                  key={menu.id}
+                  className="glass-card overflow-hidden group animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {/* Card Header Gradient */}
+                  <div className={`h-2 bg-gradient-to-r ${config?.gradient || 'from-primary-400 to-primary-500'}`} />
+
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl ${config?.bgColor || 'bg-surface-100'} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon size={24} className={config?.color || 'text-surface-600'} />
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${config?.bgColor || 'bg-surface-100'} ${config?.color || 'text-surface-600'}`}>
+                          {config?.label || menu.kategori}
+                        </span>
+                        <span className="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                          Database
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-surface-800 mb-2">{menu.nama_menu}</h3>
+                    <p className="text-sm text-surface-500 mb-3 leading-relaxed">{menu.deskripsi}</p>
+
+                    {/* Bahan utama */}
+                    {menu.bahan_utama && (
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {menu.bahan_utama.map((bahan: string, i: number) => (
+                          <span key={i} className="text-[10px] font-medium bg-surface-100 text-surface-600 px-2 py-0.5 rounded-full">
+                            {bahan}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-1.5 text-xs text-surface-400 mb-4">
+                      <Info size={12} />
+                      <span>Umur: {menu.min_umur_bulan}-{menu.max_umur_bulan} bulan</span>
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-4 border-t border-surface-100">
+                      {menu.kalori_estimasi && (
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-surface-800">{menu.kalori_estimasi}</p>
+                          <p className="text-xs text-surface-400">kkal</p>
+                        </div>
+                      )}
+                      {menu.protein_estimasi && (
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-surface-800">{menu.protein_estimasi}g</p>
+                          <p className="text-xs text-surface-400">protein</p>
+                        </div>
+                      )}
+                      {menu.waktu_masak && (
+                        <div className="flex items-center gap-1 text-xs text-surface-400 ml-auto">
+                          <Clock size={12} />
+                          <span>{menu.waktu_masak}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Cara Masak Button */}
+                    <button
+                      onClick={() => handleCookingGuide(menu)}
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-xl text-sm font-semibold hover:from-blue-100 hover:to-blue-200 transition-all duration-200 border border-blue-100"
+                    >
+                      <ChefHat size={16} />
+                      Cara Masak
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* AI Generated Menu Section */}
       <div>
         <div className="flex items-center justify-between mb-5 animate-fade-in-up animate-delay-200">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-surface-800">Menu yang Direkomendasikan</h2>
+            <h2 className="text-xl font-bold text-surface-800">Menu <span className="gradient-text">AI Generate</span></h2>
             {isCached && (
               <span className="text-[10px] font-bold text-surface-400 bg-surface-100 px-2 py-0.5 rounded-full uppercase">Cache</span>
             )}
@@ -318,6 +447,8 @@ export default function RekomendasiPage() {
             {generating ? 'Generating...' : 'Generate Ulang'}
           </button>
         </div>
+
+        <p className="text-surface-500 text-sm mb-6">Menu personal yang di-generate khusus oleh AI berdasarkan kondisi {child.nama_anak}.</p>
 
         {/* Generating state */}
         {generating && aiMenus.length === 0 && (
@@ -366,9 +497,14 @@ export default function RekomendasiPage() {
                       <div className={`w-12 h-12 rounded-xl ${config?.bgColor || 'bg-surface-100'} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <Icon size={24} className={config?.color || 'text-surface-600'} />
                       </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${config?.bgColor || 'bg-surface-100'} ${config?.color || 'text-surface-600'}`}>
-                        {config?.label || menu.kategori}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${config?.bgColor || 'bg-surface-100'} ${config?.color || 'text-surface-600'}`}>
+                          {config?.label || menu.kategori}
+                        </span>
+                        <span className="text-[10px] font-medium bg-gradient-to-r from-primary-50 to-accent-50 text-primary-600 px-2 py-0.5 rounded-full border border-primary-100">
+                          AI Generated
+                        </span>
+                      </div>
                     </div>
 
                     <h3 className="text-lg font-bold text-surface-800 mb-2">{menu.nama_menu}</h3>
