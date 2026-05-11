@@ -153,8 +153,8 @@ export default function AdminSettings() {
     
     try {
       const config = service === 'gemini' 
-        ? { apiKey: settings?.gemini_api_key }
-        : { url: settings?.supabase_url, key: settings?.supabase_service_role_key };
+        ? { apiKey: geminiKey }
+        : { url: supabaseUrl, key: supabaseRoleKey };
 
       const response = await fetch('/api/admin/test-connection', {
         method: 'POST',

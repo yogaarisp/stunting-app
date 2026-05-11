@@ -3,7 +3,7 @@
  * Komunikasi server-side dengan Gemini untuk generate menu & cooking guide
  */
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
 
 const MAX_RETRIES = 2;
 const INITIAL_RETRY_DELAY_MS = 4000;
