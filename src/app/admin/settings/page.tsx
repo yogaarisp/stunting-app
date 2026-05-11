@@ -154,6 +154,54 @@ export default function AdminSettings() {
   const [supabaseUrl, setSupabaseUrl] = useState('');
   const [supabaseRoleKey, setSupabaseRoleKey] = useState('');
 
+  // Helper to format values for SQL
+  const formatSQLValue = (value: any) => {
+    if (value === null || value === undefined) return 'NULL';
+    if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`;
+    if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
+    return value;
+  };
+
+  // BACKUP FUNCTION (SQL FORMAT)
+  const handleFullBackup = async () => {
+    setIsBackupLoading(true);
+    try {
+      const supabase = createClient();
+      const tables = ['profiles', 'children', 'histori_perkembangan', 'menus', 'edukasi', 'settings'];
+      let sqlContent = `-- NutriTrack Backup\n-- Generated on ${new Date().toLocaleString()}\n\n`;
+
+      for (const table of tables) {
+        const { data, error } = await supabase.from(table).select('*');
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          sqlContent += `-- Table: ${table}\n`;
+          const columns = Object.keys(data[0]).join(', ');
+          
+          data.forEach(row => {
+            const values = Object.values(row).map(val => formatSQLValue(val)).join(', ');
+            sqlContent += `INSERT INTO public.${table} (${columns}) VALUES (${values}) ON CONFLICT (id) DO UPDATE SET ${Object.keys(row).map(k => `${k} = EXCLUDED.${k}`).join(', ')};\n`;
+          });
+          sqlContent += '\n';
+        }
+      }
+
+      const blob = new Blob([sqlContent], { type: 'text/sql' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `backup_nutritrack_${new Date().toISOString().split('T')[0]}.sql`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      setMessage({ type: 'success', text: 'Backup SQL berhasil diunduh!' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: 'Gagal melakukan backup SQL: ' + err.message });
+    } finally {
+      setIsBackupLoading(false);
+    }
+  };
+
   // Update setSettings to populate these
   useEffect(() => {
     if (settings) {
