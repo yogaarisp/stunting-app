@@ -179,9 +179,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ menus, cached: false });
 
   } catch (error: any) {
-    console.error('Generate menu error:', error);
+    console.error('CRITICAL: Generate menu error:', error);
     return NextResponse.json(
-      { error: 'Gagal generate menu. Silakan coba lagi.', details: error.message },
+      { 
+        error: 'Gagal generate menu. Silakan coba lagi.', 
+        message: error.message,
+        details: error.stack || 'No stack trace'
+      },
       { status: 500 }
     );
   }
