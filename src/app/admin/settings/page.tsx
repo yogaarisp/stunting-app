@@ -17,7 +17,8 @@ import {
   Database,
   Download,
   RefreshCw,
-  FileCode
+  FileCode,
+  BarChart3
 } from 'lucide-react';
 import Link from 'next/link';
 import { AppSettings } from '@/lib/types';
@@ -147,6 +148,67 @@ export default function AdminSettings() {
     gemini: { loading: false, message: '', success: null },
     supabase: { loading: false, message: '', success: null }
   });
+
+  // CHART RECOMMENDATION TESTING
+  const [testChartStatus, setTestChartStatus] = useState<{ loading: boolean; message: string; success: boolean | null }>({
+    loading: false, message: '', success: null
+  });
+
+  const testChartRecommendation = async () => {
+    setTestChartStatus({ loading: true, message: '', success: null });
+    
+    try {
+      // Sample data untuk test
+      const testData = {
+        childId: 'test-child-123',
+        chartData: {
+          berat_badan: [8.5, 9.0, 9.2],
+          tinggi_badan: [70, 72, 73],
+          umur_bulan: [12, 13, 14],
+          dates: ['2024-01-01', '2024-02-01', '2024-03-01']
+        },
+        childInfo: {
+          nama_anak: 'Test Child',
+          jenis_kelamin: 'Laki-laki',
+          umur_bulan: 14,
+          alergi: 'Tidak ada'
+        },
+        currentStatus: {
+          bbStatus: 'kurang',
+          tbStatus: 'normal',
+          trend: 'naik' as const
+        }
+      };
+
+      const response = await fetch('/api/chart-recommendation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(testData),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.recommendation) {
+        setTestChartStatus({ 
+          loading: false, 
+          message: 'Rekomendasi grafik berhasil! AI dapat menganalisis data pertumbuhan anak.', 
+          success: true 
+        });
+      } else {
+        setTestChartStatus({ 
+          loading: false, 
+          message: data.error || 'Test gagal tanpa pesan error.', 
+          success: false 
+        });
+      }
+    } catch (err: any) {
+      setTestChartStatus({ 
+        loading: false, 
+        message: 'Terjadi kesalahan sistem saat test rekomendasi grafik.', 
+        success: false 
+      });
+    }
+  };
 
   const testConnection = async (service: 'gemini' | 'supabase') => {
     setTestStatus(prev => ({ ...prev, [service]: { ...prev[service], loading: true, message: '' } }));
@@ -353,15 +415,26 @@ export default function AdminSettings() {
                     <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2 px-1">
                       <Sparkles size={14} className="text-primary-500" /> Google Gemini API Key
                     </label>
-                    <button 
-                      type="button"
-                      onClick={() => testConnection('gemini')}
-                      disabled={testStatus.gemini.loading}
-                      className="text-[10px] font-bold text-primary-600 hover:bg-primary-50 px-3 py-1 rounded-full border border-primary-100 transition-all flex items-center gap-1.5"
-                    >
-                      {testStatus.gemini.loading ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-                      Test Koneksi
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => testConnection('gemini')}
+                        disabled={testStatus.gemini.loading}
+                        className="text-[10px] font-bold text-primary-600 hover:bg-primary-50 px-3 py-1 rounded-full border border-primary-100 transition-all flex items-center gap-1.5"
+                      >
+                        {testStatus.gemini.loading ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                        Test Koneksi
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => testChartRecommendation()}
+                        disabled={testChartStatus.loading}
+                        className="text-[10px] font-bold text-green-600 hover:bg-green-50 px-3 py-1 rounded-full border border-green-100 transition-all flex items-center gap-1.5"
+                      >
+                        {testChartStatus.loading ? <Loader2 size={10} className="animate-spin" /> : <BarChart3 size={10} />}
+                        Test Grafik
+                      </button>
+                    </div>
                   </div>
                   <input 
                     type="password"
@@ -373,6 +446,11 @@ export default function AdminSettings() {
                   {testStatus.gemini.message && (
                     <p className={`text-[10px] font-bold px-3 py-1.5 rounded-lg ${testStatus.gemini.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                       {testStatus.gemini.message}
+                    </p>
+                  )}
+                  {testChartStatus.message && (
+                    <p className={`text-[10px] font-bold px-3 py-1.5 rounded-lg ${testChartStatus.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                      <strong>Test Grafik:</strong> {testChartStatus.message}
                     </p>
                   )}
                   <p className="text-[10px] text-surface-400 italic">Kosongkan untuk menggunakan API Key bawaan dari .env</p>
