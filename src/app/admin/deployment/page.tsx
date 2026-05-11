@@ -267,7 +267,7 @@ export default function DeploymentPage() {
 
             <div className="space-y-4">
               <div className="p-4 bg-white rounded-xl border border-amber-100">
-                <h4 className="font-bold text-amber-800 mb-2">❌ Error: "supabaseKey is required"</h4>
+                <h4 className="font-bold text-amber-800 mb-2">❌ Error: &quot;supabaseKey is required&quot;</h4>
                 <p className="text-sm text-amber-700 mb-3">Environment variable SUPABASE_SERVICE_ROLE_KEY belum dikonfigurasi di Vercel.</p>
                 <div className="text-xs text-amber-600 space-y-1">
                   <p>1. Buka Vercel Dashboard → Settings → Environment Variables</p>
@@ -277,7 +277,7 @@ export default function DeploymentPage() {
               </div>
 
               <div className="p-4 bg-white rounded-xl border border-amber-100">
-                <h4 className="font-bold text-amber-800 mb-2">❌ Error: "API Key tidak valid"</h4>
+                <h4 className="font-bold text-amber-800 mb-2">❌ Error: &quot;API Key tidak valid&quot;</h4>
                 <p className="text-sm text-amber-700 mb-3">Google Gemini API Key belum dikonfigurasi atau salah.</p>
                 <div className="text-xs text-amber-600 space-y-1">
                   <p>1. Pastikan GOOGLE_GEMINI_API_KEY sudah ditambahkan di Vercel</p>
@@ -287,7 +287,7 @@ export default function DeploymentPage() {
               </div>
 
               <div className="p-4 bg-white rounded-xl border border-amber-100">
-                <h4 className="font-bold text-amber-800 mb-2">⚠️ Error: "Quota exceeded"</h4>
+                <h4 className="font-bold text-amber-800 mb-2">⚠️ Error: &quot;Quota exceeded&quot;</h4>
                 <p className="text-sm text-amber-700 mb-3">API Key Gemini sudah mencapai quota limit.</p>
                 <div className="text-xs text-amber-600 space-y-1">
                   <p>1. Tunggu quota reset (24 jam)</p>

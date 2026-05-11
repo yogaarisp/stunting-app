@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { 
   Settings as SettingsIcon, 
@@ -37,7 +37,7 @@ export default function AdminSettings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const restoreInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     const supabase = createClient();
     const { data } = await supabase
       .from('settings')
@@ -62,7 +62,7 @@ export default function AdminSettings() {
       fetchEnvVariables();
     }
     setLoading(false);
-  };
+  }, []);
 
   const fetchEnvVariables = async () => {
     try {
@@ -80,7 +80,7 @@ export default function AdminSettings() {
 
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
