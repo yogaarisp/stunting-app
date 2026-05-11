@@ -154,6 +154,32 @@ export default function AdminSettings() {
     loading: false, message: '', success: null
   });
 
+  // ENVIRONMENT CHECK
+  const [envCheckStatus, setEnvCheckStatus] = useState<{ loading: boolean; message: string; success: boolean | null }>({
+    loading: false, message: '', success: null
+  });
+
+  const checkEnvironment = async () => {
+    setEnvCheckStatus({ loading: true, message: '', success: null });
+    
+    try {
+      const response = await fetch('/api/admin/check-env');
+      const data = await response.json();
+      
+      setEnvCheckStatus({ 
+        loading: false, 
+        message: data.message, 
+        success: data.success 
+      });
+    } catch (err: any) {
+      setEnvCheckStatus({ 
+        loading: false, 
+        message: 'Gagal memeriksa environment variables.', 
+        success: false 
+      });
+    }
+  };
+
   const testChartRecommendation = async () => {
     setTestChartStatus({ loading: true, message: '', success: null });
     
@@ -403,10 +429,30 @@ export default function AdminSettings() {
 
             {/* System & API Configuration */}
             <div className="glass-card p-8 border-surface-200 bg-surface-50/20">
-              <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 mb-8 uppercase tracking-wider">
-                <RefreshCw size={18} className="text-amber-500" />
-                Konfigurasi Sistem & API
-              </h3>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 uppercase tracking-wider">
+                  <RefreshCw size={18} className="text-amber-500" />
+                  Konfigurasi Sistem & API
+                </h3>
+                <button 
+                  type="button"
+                  onClick={checkEnvironment}
+                  disabled={envCheckStatus.loading}
+                  className="text-[10px] font-bold text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-full border border-blue-100 transition-all flex items-center gap-1.5"
+                >
+                  {envCheckStatus.loading ? <Loader2 size={10} className="animate-spin" /> : <Database size={10} />}
+                  Check Environment
+                </button>
+              </div>
+
+              {envCheckStatus.message && (
+                <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 animate-shake font-bold text-sm ${
+                  envCheckStatus.success ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+                }`}>
+                  {envCheckStatus.success ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                  {envCheckStatus.message}
+                </div>
+              )}
 
               <div className="space-y-8">
                 {/* Gemini API */}

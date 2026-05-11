@@ -129,10 +129,25 @@ export async function POST(request: NextRequest) {
   try {
     const body: MenuRequest = await request.json();
     
+    // Validate environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      return NextResponse.json(
+        { error: 'Konfigurasi database tidak ditemukan. Hubungi administrator.' },
+        { status: 500 }
+      );
+    }
+    
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        { error: 'Konfigurasi service key tidak ditemukan. Hubungi administrator.' },
+        { status: 500 }
+      );
+    }
+    
     // Create admin client for cache operations
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
     const conditionHash = generateConditionHash(body);
