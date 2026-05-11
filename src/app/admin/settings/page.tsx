@@ -48,8 +48,33 @@ export default function AdminSettings() {
       setSettings(data);
       setBrandName(data.brand_name);
       setLogoUrl(data.logo_url || '');
+      
+      // If DB has values, use them. If not, fetch from ENV API
+      if (data.gemini_api_key || data.supabase_url) {
+        setGeminiKey(data.gemini_api_key || '');
+        setSupabaseUrl(data.supabase_url || '');
+        setSupabaseRoleKey(data.supabase_service_role_key || '');
+      } else {
+        fetchEnvVariables();
+      }
+    } else {
+      fetchEnvVariables();
     }
     setLoading(false);
+  };
+
+  const fetchEnvVariables = async () => {
+    try {
+      const res = await fetch('/api/admin/get-env');
+      const envData = await res.json();
+      if (!envData.error) {
+        setGeminiKey(prev => prev || envData.gemini_api_key);
+        setSupabaseUrl(prev => prev || envData.supabase_url);
+        setSupabaseRoleKey(prev => prev || envData.supabase_service_role_key);
+      }
+    } catch (err) {
+      console.error('Failed to fetch ENV', err);
+    }
   };
 
   useEffect(() => {
