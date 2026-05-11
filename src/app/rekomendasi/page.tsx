@@ -339,7 +339,7 @@ export default function RekomendasiPage() {
       {databaseMenus.length > 0 && (
         <div className="animate-fade-in-up animate-delay-200">
           <div className="flex items-center gap-3 mb-5">
-            <h2 className="text-xl font-bold text-surface-800">Menu Rekomendasi <span className="gradient-text">Database</span></h2>
+            <h2 className="text-xl font-bold text-surface-800">Menu Rekomendasi <span className="gradient-text"></span></h2>
             <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">Otomatis</span>
           </div>
           <p className="text-surface-500 text-sm mb-6">Menu yang sesuai dengan kriteria {child.nama_anak} berdasarkan database kami.</p>
