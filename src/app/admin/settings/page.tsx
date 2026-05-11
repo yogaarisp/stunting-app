@@ -117,60 +117,78 @@ export default function AdminSettings() {
     setSaving(false);
   };
 
-  // Helper to format values for SQL
-  const formatSQLValue = (value: any) => {
-    if (value === null || value === undefined) return 'NULL';
-    if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`;
-    if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
-    return value;
-  };
+  // CONNECTION TESTING
+  const [testStatus, setTestStatus] = useState<Record<string, { loading: boolean; message: string; success: boolean | null }>>({
+    gemini: { loading: false, message: '', success: null },
+    supabase: { loading: false, message: '', success: null }
+  });
 
-  // BACKUP FUNCTION (SQL FORMAT)
-  const handleFullBackup = async () => {
-    setIsBackupLoading(true);
+  const testConnection = async (service: 'gemini' | 'supabase') => {
+    setTestStatus(prev => ({ ...prev, [service]: { ...prev[service], loading: true, message: '' } }));
+    
     try {
-      const supabase = createClient();
-      const tables = ['profiles', 'children', 'histori_perkembangan', 'menus', 'edukasi', 'settings'];
-      let sqlContent = `-- NutriTrack Backup\n-- Generated on ${new Date().toLocaleString()}\n\n`;
+      const config = service === 'gemini' 
+        ? { apiKey: settings?.gemini_api_key }
+        : { url: settings?.supabase_url, key: settings?.supabase_service_role_key };
 
-      for (const table of tables) {
-        const { data, error } = await supabase.from(table).select('*');
-        if (error) throw error;
+      const response = await fetch('/api/admin/test-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ service, config }),
+      });
 
-        if (data && data.length > 0) {
-          sqlContent += `-- Table: ${table}\n`;
-          const columns = Object.keys(data[0]).join(', ');
-          
-          data.forEach(row => {
-            const values = Object.values(row).map(val => formatSQLValue(val)).join(', ');
-            sqlContent += `INSERT INTO public.${table} (${columns}) VALUES (${values}) ON CONFLICT (id) DO UPDATE SET ${Object.keys(row).map(k => `${k} = EXCLUDED.${k}`).join(', ')};\n`;
-          });
-          sqlContent += '\n';
-        }
-      }
-
-      const blob = new Blob([sqlContent], { type: 'text/sql' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `backup_nutritrack_${new Date().toISOString().split('T')[0]}.sql`;
-      link.click();
-      URL.revokeObjectURL(url);
-
-      setMessage({ type: 'success', text: 'Backup SQL berhasil diunduh!' });
+      const data = await response.json();
+      setTestStatus(prev => ({ 
+        ...prev, 
+        [service]: { loading: false, message: data.message, success: data.success } 
+      }));
     } catch (err: any) {
-      setMessage({ type: 'error', text: 'Gagal melakukan backup SQL: ' + err.message });
-    } finally {
-      setIsBackupLoading(false);
+      setTestStatus(prev => ({ 
+        ...prev, 
+        [service]: { loading: false, message: 'Terjadi kesalahan sistem.', success: false } 
+      }));
     }
   };
 
-  // RESTORE FUNCTION (SQL PARSING IS LIMITED, STILL USING JSON FOR RESTORE IN APP)
-  const handleFullRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [geminiKey, setGeminiKey] = useState('');
+  const [supabaseUrl, setSupabaseUrl] = useState('');
+  const [supabaseRoleKey, setSupabaseRoleKey] = useState('');
 
-    setMessage({ type: 'error', text: 'Fitur Restore langsung dari .sql di web terbatas. Silakan jalankan isi file .sql tersebut di SQL Editor Supabase Dashboard Anda.' });
+  // Update setSettings to populate these
+  useEffect(() => {
+    if (settings) {
+      setGeminiKey(settings.gemini_api_key || '');
+      setSupabaseUrl(settings.supabase_url || '');
+      setSupabaseRoleKey(settings.supabase_service_role_key || '');
+    }
+  }, [settings]);
+
+  const handleSaveAll = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage({ type: '', text: '' });
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('settings')
+      .update({
+        brand_name: brandName,
+        logo_url: logoUrl,
+        gemini_api_key: geminiKey || null,
+        supabase_url: supabaseUrl || null,
+        supabase_service_role_key: supabaseRoleKey || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', 1);
+
+    if (error) {
+      setMessage({ type: 'error', text: 'Gagal menyimpan pengaturan: ' + error.message });
+    } else {
+      setMessage({ type: 'success', text: 'Pengaturan berhasil diperbarui!' });
+      window.dispatchEvent(new Event('settingsUpdated'));
+      fetchSettings();
+    }
+    setSaving(false);
   };
 
   if (loading) return (
@@ -193,27 +211,28 @@ export default function AdminSettings() {
           </div>
           Pengaturan <span className="gradient-text">Aplikasi</span>
         </h1>
-        <p className="text-surface-500 mt-1 max-w-md">Sesuaikan identitas brand dan kelola cadangan data SQL aplikasi di sini.</p>
+        <p className="text-surface-500 mt-1 max-w-md">Konfigurasi identitas, API, dan manajemen data SQL NutriTrack.</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8 items-start animate-fade-in-up animate-delay-100">
         <div className="lg:col-span-2 space-y-8">
-          {/* Settings Form */}
-          <div className="glass-card p-8 sm:p-10 border-surface-200">
-            <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 mb-8 uppercase tracking-wider">
-              <ImageIcon size={18} className="text-primary-500" />
-              Identitas Visual
-            </h3>
+          
+          <form onSubmit={handleSaveAll} className="space-y-8">
+            {message.text && (
+              <div className={`p-4 rounded-2xl flex items-center gap-3 animate-shake font-bold text-sm ${
+                message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+              }`}>
+                {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                {message.text}
+              </div>
+            )}
 
-            <form onSubmit={handleSave} className="space-y-8">
-              {message.text && (
-                <div className={`p-4 rounded-2xl flex items-center gap-3 animate-shake font-bold text-sm ${
-                  message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
-                }`}>
-                  {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                  {message.text}
-                </div>
-              )}
+            {/* Visual Settings */}
+            <div className="glass-card p-8 border-surface-200">
+              <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 mb-8 uppercase tracking-wider">
+                <ImageIcon size={18} className="text-primary-500" />
+                Identitas Visual
+              </h3>
 
               <div className="space-y-8">
                 <div className="space-y-2">
@@ -245,20 +264,109 @@ export default function AdminSettings() {
                   </div>
                 </div>
               </div>
+            </div>
 
-              <button type="submit" disabled={saving || uploading} className="btn-primary w-full sm:w-auto px-10 py-4 text-sm font-bold shadow-xl shadow-primary-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50">
-                {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                <span>Simpan Perubahan</span>
-              </button>
-            </form>
-          </div>
+            {/* System & API Configuration */}
+            <div className="glass-card p-8 border-surface-200 bg-surface-50/20">
+              <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 mb-8 uppercase tracking-wider">
+                <RefreshCw size={18} className="text-amber-500" />
+                Konfigurasi Sistem & API
+              </h3>
+
+              <div className="space-y-8">
+                {/* Gemini API */}
+                <div className="space-y-4 p-6 bg-white rounded-3xl border border-surface-100 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                      <Sparkles size={14} className="text-primary-500" /> Google Gemini API Key
+                    </label>
+                    <button 
+                      type="button"
+                      onClick={() => testConnection('gemini')}
+                      disabled={testStatus.gemini.loading}
+                      className="text-[10px] font-bold text-primary-600 hover:bg-primary-50 px-3 py-1 rounded-full border border-primary-100 transition-all flex items-center gap-1.5"
+                    >
+                      {testStatus.gemini.loading ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                      Test Koneksi
+                    </button>
+                  </div>
+                  <input 
+                    type="password"
+                    value={geminiKey}
+                    onChange={(e) => setGeminiKey(e.target.value)}
+                    className="form-input text-xs font-mono"
+                    placeholder="AIzaSy..."
+                  />
+                  {testStatus.gemini.message && (
+                    <p className={`text-[10px] font-bold px-3 py-1.5 rounded-lg ${testStatus.gemini.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                      {testStatus.gemini.message}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-surface-400 italic">Kosongkan untuk menggunakan API Key bawaan dari .env</p>
+                </div>
+
+                {/* Supabase */}
+                <div className="space-y-4 p-6 bg-white rounded-3xl border border-surface-100 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                      <Database size={14} className="text-blue-500" /> Supabase Connection
+                    </label>
+                    <button 
+                      type="button"
+                      onClick={() => testConnection('supabase')}
+                      disabled={testStatus.supabase.loading}
+                      className="text-[10px] font-bold text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-full border border-blue-100 transition-all flex items-center gap-1.5"
+                    >
+                      {testStatus.supabase.loading ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                      Test Koneksi
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-surface-400 ml-1">SUPABASE URL</p>
+                      <input 
+                        type="text"
+                        value={supabaseUrl}
+                        onChange={(e) => setSupabaseUrl(e.target.value)}
+                        className="form-input text-xs font-mono"
+                        placeholder="https://xxx.supabase.co"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-bold text-surface-400 ml-1">SERVICE ROLE KEY</p>
+                      <input 
+                        type="password"
+                        value={supabaseRoleKey}
+                        onChange={(e) => setSupabaseRoleKey(e.target.value)}
+                        className="form-input text-xs font-mono"
+                        placeholder="sb_secret_..."
+                      />
+                    </div>
+                  </div>
+                  {testStatus.supabase.message && (
+                    <p className={`text-[10px] font-bold px-3 py-1.5 rounded-lg ${testStatus.supabase.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                      {testStatus.supabase.message}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-surface-400 italic font-medium text-amber-600 flex items-center gap-1">
+                    <AlertCircle size={10} /> Hati-hati: Key ini bersifat sangat rahasia.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" disabled={saving || uploading} className="btn-primary w-full sm:w-auto px-10 py-4 text-sm font-bold shadow-xl shadow-primary-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50">
+              {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+              <span>Simpan Semua Pengaturan</span>
+            </button>
+          </form>
 
           {/* SQL DATABASE MANAGEMENT SECTION */}
           <div className="glass-card p-8 sm:p-10 border-surface-200 bg-surface-50/30">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
               <div>
                 <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 uppercase tracking-wider">
-                  <Database size={18} className="text-blue-500" />
+                  <Database size={18} className="text-indigo-500" />
                   Manajemen Data (SQL)
                 </h3>
                 <p className="text-[11px] text-surface-500 mt-1">Ekspor data aplikasi ke format standar SQL.</p>
@@ -295,14 +403,13 @@ export default function AdminSettings() {
           <div className="glass-card p-8 border-surface-200 bg-white shadow-xl">
             <h3 className="text-sm font-bold text-surface-800 flex items-center gap-2 mb-6">
               <Layout size={18} className="text-primary-500" />
-              Pratinjau
+              Pratinjau Sidebar
             </h3>
             <div className="space-y-6">
               <div className="space-y-2">
-                <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest">Sidebar</p>
                 <div className="bg-surface-50 rounded-2xl p-4 flex items-center gap-3 border border-surface-100">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/20 overflow-hidden">
-                    {logoUrl ? <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /> : <span className="text-white text-xl">👶</span>}
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/20 overflow-hidden text-white font-black">
+                    {logoUrl ? <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /> : brandName.substring(0, 1) || 'N'}
                   </div>
                   <div><h4 className="text-sm font-extrabold text-primary-600 leading-none">{brandName || 'NutriTrack'}</h4><p className="text-[10px] text-surface-400 mt-1">Stunting Tracker</p></div>
                 </div>
@@ -314,3 +421,6 @@ export default function AdminSettings() {
     </div>
   );
 }
+
+// Sparkles import needed for Gemini label
+import { Sparkles } from 'lucide-react';

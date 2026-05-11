@@ -79,6 +79,10 @@ export interface AppSettings {
   id: number;
   brand_name: string;
   logo_url: string | null;
+  gemini_api_key: string | null;
+  supabase_url: string | null;
+  supabase_anon_key: string | null;
+  supabase_service_role_key: string | null;
   updated_at: string;
 }
 
