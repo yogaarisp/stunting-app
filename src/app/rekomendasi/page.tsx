@@ -108,9 +108,7 @@ export default function RekomendasiPage() {
       // Build query for matching categories
       let query = supabase
         .from('menus')
-        .select('*')
-        .lte('min_umur_bulan', umurBulan)
-        .gte('max_umur_bulan', umurBulan);
+        .select('*');
 
       // Filter by categories (OR condition for multiple categories)
       if (kategoriRekomendasi.length > 0) {
@@ -126,6 +124,7 @@ export default function RekomendasiPage() {
         return;
       }
 
+      console.log('Database menus fetched:', menus); // Debug log
       setDatabaseMenus(menus || []);
     } catch (err) {
       console.error('Failed to fetch database menus:', err);
@@ -193,8 +192,8 @@ export default function RekomendasiPage() {
 
   // Menu generation is now manual — user clicks "Generate Menu" button
 
-  // Cooking guide handler
-  const handleCookingGuide = async (menu: AIGeneratedMenu) => {
+  // Cooking guide handler - works for both database and AI menus
+  const handleCookingGuide = async (menu: any) => {
     setCookingMenuName(menu.nama_menu);
     setCookingModal(true);
     setCookingLoading(true);
@@ -207,7 +206,7 @@ export default function RekomendasiPage() {
         body: JSON.stringify({
           menuName: menu.nama_menu,
           deskripsi: menu.deskripsi,
-          bahan_utama: menu.bahan_utama,
+          bahan_utama: menu.bahan_utama || (menu.nutrisi ? menu.nutrisi.split(',').map((n: string) => n.trim()) : []),
           childAge: child?.umur_bulan || 12,
           allergies: child?.alergi || '',
         }),
@@ -377,11 +376,11 @@ export default function RekomendasiPage() {
                     <p className="text-sm text-surface-500 mb-3 leading-relaxed">{menu.deskripsi}</p>
 
                     {/* Bahan utama */}
-                    {menu.bahan_utama && (
+                    {menu.nutrisi && (
                       <div className="flex flex-wrap gap-1 mb-4">
-                        {menu.bahan_utama.map((bahan: string, i: number) => (
+                        {menu.nutrisi.split(',').map((nutrisi: string, i: number) => (
                           <span key={i} className="text-[10px] font-medium bg-surface-100 text-surface-600 px-2 py-0.5 rounded-full">
-                            {bahan}
+                            {nutrisi.trim()}
                           </span>
                         ))}
                       </div>
@@ -389,26 +388,26 @@ export default function RekomendasiPage() {
 
                     <div className="flex items-center gap-1.5 text-xs text-surface-400 mb-4">
                       <Info size={12} />
-                      <span>Umur: {menu.min_umur_bulan}-{menu.max_umur_bulan} bulan</span>
+                      <span>Menu Database</span>
                     </div>
 
                     <div className="flex items-center gap-4 pt-4 border-t border-surface-100">
-                      {menu.kalori_estimasi && (
+                      {menu.kalori && (
                         <div className="text-center">
-                          <p className="text-lg font-bold text-surface-800">{menu.kalori_estimasi}</p>
+                          <p className="text-lg font-bold text-surface-800">{menu.kalori}</p>
                           <p className="text-xs text-surface-400">kkal</p>
                         </div>
                       )}
-                      {menu.protein_estimasi && (
+                      {menu.protein && (
                         <div className="text-center">
-                          <p className="text-lg font-bold text-surface-800">{menu.protein_estimasi}g</p>
+                          <p className="text-lg font-bold text-surface-800">{menu.protein}g</p>
                           <p className="text-xs text-surface-400">protein</p>
                         </div>
                       )}
-                      {menu.waktu_masak && (
-                        <div className="flex items-center gap-1 text-xs text-surface-400 ml-auto">
-                          <Clock size={12} />
-                          <span>{menu.waktu_masak}</span>
+                      {menu.kalsium && (
+                        <div className="text-center">
+                          <p className="text-lg font-bold text-surface-800">{menu.kalsium}mg</p>
+                          <p className="text-xs text-surface-400">kalsium</p>
                         </div>
                       )}
                     </div>
