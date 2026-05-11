@@ -140,7 +140,8 @@ export default function RekomendasiPage() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Gagal generate menu');
+        // Show detailed message from server if available (e.g. Quota Exceeded or Config Error)
+        throw new Error(data.message || data.error || 'Gagal generate menu');
       }
 
       setAiMenus(data.menus || []);
