@@ -152,7 +152,7 @@ export default function ManageMicrobiota() {
             <div className="p-8 text-center text-surface-500 font-medium">
               <Dna size={40} className="mx-auto text-surface-300 mb-3" />
               <p>Belum ada aturan mikrobiota.</p>
-              <p className="text-xs text-surface-400 mt-1">Klik "Tambah Aturan" untuk mulai.</p>
+              <p className="text-xs text-surface-400 mt-1">Klik &quot;Tambah Aturan&quot; untuk mulai.</p>
             </div>
           ) : (
             filteredItems.map((item) => (
