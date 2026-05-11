@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     // Generate via Gemini
     const prompt = buildMenuPrompt(body, microbiotaRules);
-    const rawResponse = await callGemini(prompt);
+    const rawResponse = await callGemini(prompt, { isJson: true });
     const menus = parseGeminiJSON<any[]>(rawResponse);
 
     // Save to cache

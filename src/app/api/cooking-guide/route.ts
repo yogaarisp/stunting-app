@@ -48,7 +48,7 @@ SYARAT:
 5. Pastikan TIDAK menggunakan bahan alergen
 6. Berikan HANYA JSON, tanpa penjelasan tambahan`;
 
-    const rawResponse = await callGemini(prompt);
+    const rawResponse = await callGemini(prompt, { isJson: true });
     
     // Parse response — handle markdown wrapping
     let guide;

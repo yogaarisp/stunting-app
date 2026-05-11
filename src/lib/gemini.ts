@@ -8,8 +8,8 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemi
 const MAX_RETRIES = 2;
 const INITIAL_RETRY_DELAY_MS = 4000;
 
-export async function callGemini(prompt: string): Promise<string> {
-  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+export async function callGemini(prompt: string, options?: { apiKey?: string; isJson?: boolean }): Promise<string> {
+  const apiKey = options?.apiKey || process.env.GOOGLE_GEMINI_API_KEY;
   
   if (!apiKey) {
     throw new Error('GOOGLE_GEMINI_API_KEY is not configured');
@@ -32,7 +32,7 @@ export async function callGemini(prompt: string): Promise<string> {
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2048,
-          responseMimeType: 'application/json',
+          ...(options?.isJson ? { responseMimeType: 'application/json' } : {}),
         },
       }),
     });

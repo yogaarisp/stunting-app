@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
       // Test with a very small prompt
       try {
-        const result = await callGemini('Say "OK"');
+        const result = await callGemini('Say "OK"', { apiKey, isJson: false });
         if (result.includes('OK')) {
           return NextResponse.json({ success: true, message: 'Koneksi Gemini API Berhasil!' });
         }
