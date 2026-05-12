@@ -352,10 +352,23 @@ export default function Sidebar() {
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-surface-200/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:hidden pb-safe">
         <div className="flex items-center justify-around px-2 py-2">
+          {!isLoading && (
+            <button
+              onClick={() => setIsOpen(true)}
+              className="flex flex-col items-center justify-center py-1 gap-1 transition-colors text-surface-400 hover:text-surface-600"
+            >
+              <div className="p-1.5 rounded-xl transition-colors bg-transparent">
+                <Menu size={20} strokeWidth={2} />
+              </div>
+              <span className="text-[10px] font-medium leading-tight">Menu</span>
+            </button>
+          )}
+
           {!isLoading && role !== 'admin' && [
-            { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { href: '/input', label: 'Input', icon: ClipboardEdit },
-            { href: '/profile', label: 'Profil', icon: UserIcon },
+            { href: '/rekomendasi', label: 'Rekomendasi', icon: Utensils },
+            { href: '/food-log', label: 'Log Makanan', icon: Camera },
+            { href: '/grafik', label: 'Grafik', icon: BarChart3 },
           ].map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
@@ -395,18 +408,6 @@ export default function Sidebar() {
               </Link>
             );
           })}
-
-          {!isLoading && (
-            <button
-              onClick={() => setIsOpen(true)}
-              className="flex flex-col items-center justify-center py-1 gap-1 transition-colors text-surface-400 hover:text-surface-600"
-            >
-              <div className="p-1.5 rounded-xl transition-colors bg-transparent">
-                <Menu size={20} strokeWidth={2} />
-              </div>
-              <span className="text-[10px] font-medium leading-tight">Menu</span>
-            </button>
-          )}
         </div>
       </nav>
     </>
