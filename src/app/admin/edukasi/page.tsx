@@ -37,6 +37,18 @@ export default function ManageEdukasi() {
     fetchEdukasi();
   }, [fetchEdukasi]);
 
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
   const handleDelete = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus konten ini?')) return;
     const supabase = createClient();
@@ -219,10 +231,9 @@ export default function ManageEdukasi() {
         </div>
       </div>
 
-      {/* Modal Tool */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-2xl h-auto max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4">
+          <div className="bg-white w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
             <div className="sticky top-0 bg-white px-6 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0">
               <button 
                 onClick={() => setIsModalOpen(false)} 
