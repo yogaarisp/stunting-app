@@ -12,6 +12,7 @@ import {
   Leaf,
   AlertTriangle,
   CheckCircle2,
+  ArrowLeft,
   ArrowRight,
   Baby,
   Info,
@@ -611,7 +612,7 @@ export default function RekomendasiPage() {
           {/* Modal Header */}
           <div className="sticky top-0 bg-white px-4 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0 shadow-sm">
             <button onClick={() => setCookingModal(false)} className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-xl transition-all">
-              <X size={20} />
+              <ArrowLeft size={20} />
             </button>
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold text-surface-800 truncate">🍳 Cara Masak</h2>
