@@ -88,9 +88,20 @@ TINGKAT RISIKO: ${analisisResult.riskLevel === 'tinggi' ? 'TINGGI - Perlu perhat
 SYARAT MENU:
 1. Semua menu HARUS aman dari alergi yang disebutkan
 2. Tekstur dan porsi HARUS sesuai untuk anak umur ${childData.umur_bulan} bulan
-3. Gunakan bahan-bahan yang mudah ditemukan di Indonesia
-4. Berikan variasi menu (jangan semua menu serupa)
-5. Setiap menu harus praktis dan bisa dimasak di rumah
+3. WAJIB menggunakan bahan-bahan murah dan mudah ditemukan di pasar tradisional Indonesia
+4. Budget per menu maksimal 10-15 ribu rupiah (bahan-bahan terjangkau)
+5. Fokus pada masakan rumahan sederhana yang bisa dibuat ibu-ibu di rumah
+6. HINDARI bahan mahal seperti: salmon, daging sapi premium, keju import, buah import
+7. Prioritaskan bahan lokal: ayam kampung, ikan lele/nila/bandeng, telur ayam, tahu, tempe, sayuran lokal
+8. Berikan variasi menu (jangan semua menu serupa)
+9. Setiap menu harus praktis dan tidak memerlukan peralatan khusus
+
+CONTOH BAHAN YANG DIREKOMENDASIKAN:
+- Protein: ayam kampung, telur, ikan air tawar (lele, nila, bandeng), tahu, tempe, kacang hijau
+- Karbohidrat: nasi, kentang, ubi, jagung, roti tawar
+- Sayuran: bayam, kangkung, wortel, labu kuning, brokoli lokal, tomat
+- Buah: pisang, pepaya, jeruk lokal, apel lokal
+- Bumbu: bawang merah/putih, jahe, kunyit, garam, gula, minyak goreng
 
 FORMAT OUTPUT (JSON array):
 [

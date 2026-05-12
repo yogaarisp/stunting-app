@@ -607,21 +607,20 @@ export default function RekomendasiPage() {
       )}
 
       {cookingModal && (
-        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4">
-          <div className="bg-white w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0">
-              <button onClick={() => setCookingModal(false)} className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-xl transition-all">
-                <X size={20} />
-              </button>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-bold text-surface-800 truncate">🍳 Cara Masak</h2>
-                <p className="text-sm text-surface-500 truncate">{cookingMenuName}</p>
-              </div>
+        <div className="fixed inset-0 z-[60] bg-white flex flex-col animate-fade-in-up">
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-white px-4 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0 shadow-sm">
+            <button onClick={() => setCookingModal(false)} className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-xl transition-all">
+              <X size={20} />
+            </button>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-surface-800 truncate">🍳 Cara Masak</h2>
+              <p className="text-sm text-surface-500 truncate">{cookingMenuName}</p>
             </div>
+          </div>
 
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto flex-1">
+          {/* Modal Content */}
+          <div className="p-4 overflow-y-auto flex-1 pb-safe">
               {cookingLoading ? (
                 <div className="text-center py-12">
                   <Loader2 size={32} className="animate-spin text-primary-500 mx-auto mb-4" />
@@ -701,7 +700,6 @@ export default function RekomendasiPage() {
                 </div>
               )}
             </div>
-          </div>
         </div>
       )}
     </div>

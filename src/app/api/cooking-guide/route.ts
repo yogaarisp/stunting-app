@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: CookingRequest = await request.json();
 
-    const prompt = `Kamu adalah chef sekaligus ahli gizi anak Indonesia. Jelaskan cara memasak menu berikut untuk anak kecil.
+    const prompt = `Kamu adalah chef sekaligus ahli gizi anak Indonesia yang berpengalaman dengan masakan rumahan sederhana dan terjangkau. Jelaskan cara memasak menu berikut untuk anak kecil.
 
 MENU: ${body.menuName}
 DESKRIPSI: ${body.deskripsi}
@@ -40,13 +40,24 @@ Berikan resep dalam format JSON:
   "catatan_gizi": "Catatan singkat tentang manfaat gizi menu ini"
 }
 
-SYARAT:
+SYARAT MASAKAN RUMAHAN TERJANGKAU:
 1. Langkah-langkah harus SINGKAT dan MUDAH dipahami ibu rumah tangga
-2. Gunakan bahasa yang sederhana
-3. Maksimal 6 langkah
+2. Gunakan bahasa yang sederhana dan praktis
+3. Maksimal 6 langkah memasak
 4. Perhatikan tekstur makanan sesuai umur anak (${body.childAge} bulan)
 5. Pastikan TIDAK menggunakan bahan alergen
-6. Berikan HANYA JSON, tanpa penjelasan tambahan`;
+6. WAJIB gunakan bahan-bahan murah dan mudah didapat di pasar tradisional
+7. Hindari peralatan masak yang mahal atau rumit
+8. Total biaya bahan maksimal 10-15 ribu rupiah
+9. Fokus pada teknik memasak sederhana: rebus, kukus, tumis, goreng biasa
+10. Berikan tips hemat dan praktis untuk ibu rumah tangga
+
+CONTOH BAHAN TERJANGKAU:
+- Protein: ayam kampung, telur, ikan air tawar, tahu, tempe
+- Sayuran: bayam, kangkung, wortel, labu kuning, tomat
+- Bumbu dasar: bawang merah/putih, garam, gula, minyak goreng
+
+Berikan HANYA JSON, tanpa penjelasan tambahan`;
 
     const rawResponse = await callGemini(prompt, { isJson: true });
     
