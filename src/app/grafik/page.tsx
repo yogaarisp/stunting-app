@@ -410,9 +410,9 @@ export default function GrafikPage() {
 
       {/* Edit History Modal */}
       {isHistoryModalOpen && editingHistory && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-surface-950/40 backdrop-blur-md">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in-up">
-            <div className="px-8 py-6 border-b border-surface-100 flex items-center justify-between bg-primary-50/50">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-surface-950/40 backdrop-blur-md sm:p-4">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-lg h-auto max-h-[92vh] overflow-hidden animate-fade-in-up flex flex-col">
+            <div className="px-8 py-6 border-b border-surface-100 flex items-center justify-between bg-primary-50/50 shrink-0">
               <h3 className="font-bold text-surface-800 flex items-center gap-2">
                 <Edit2 size={18} className="text-primary-500" />
                 Edit Catatan Pengukuran
@@ -422,7 +422,7 @@ export default function GrafikPage() {
               </button>
             </div>
 
-            <form onSubmit={handleUpdateHistory} className="p-8 space-y-5">
+            <form onSubmit={handleUpdateHistory} className="p-8 space-y-5 overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest px-1">Berat Badan (kg)</label>
@@ -463,9 +463,19 @@ export default function GrafikPage() {
               </div>
 
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setIsHistoryModalOpen(false)} className="btn-secondary flex-1">Batal</button>
-                <button type="submit" disabled={historySaving} className="btn-primary flex-1">
-                  {historySaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                <button 
+                  type="button" 
+                  onClick={() => setIsHistoryModalOpen(false)} 
+                  className="btn-secondary flex-1 py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={historySaving} 
+                  className="btn-primary flex-1 py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                >
+                  {historySaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   Simpan
                 </button>
               </div>

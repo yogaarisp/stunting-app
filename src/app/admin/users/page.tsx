@@ -335,8 +335,8 @@ export default function AdminUsers() {
 
       {/* Edit Modal */}
       {isEditModalOpen && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white w-full max-w-md h-auto max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in border border-white/20 flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-surface-900/60 backdrop-blur-sm animate-fade-in sm:p-4">
+          <div className="bg-white w-full sm:max-w-md h-auto max-h-[92vh] sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in border border-white/20 flex flex-col">
             <div className="px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-br from-surface-50 to-white border-b border-surface-100 flex items-center gap-4 sticky top-0 z-10 shrink-0">
               <button 
                 onClick={() => setIsEditModalOpen(false)} 
@@ -387,16 +387,16 @@ export default function AdminUsers() {
                 <button 
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 px-6 py-3.5 bg-surface-100 text-surface-600 rounded-2xl font-bold text-sm hover:bg-surface-200 transition-all"
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all"
                 >
                   Batal
                 </button>
                 <button 
                   type="submit"
                   disabled={actionLoading}
-                  className="flex-1 px-6 py-3.5 btn-primary shadow-lg shadow-primary-500/20 rounded-2xl font-bold text-sm disabled:opacity-50"
+                  className="btn-primary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-primary-500/20"
                 >
-                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : 'Simpan Perubahan'}
+                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Simpan Perubahan'}
                 </button>
               </div>
             </form>
@@ -427,16 +427,16 @@ export default function AdminUsers() {
               <div className="flex gap-3">
                 <button 
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="flex-1 px-6 py-3.5 bg-surface-100 text-surface-600 rounded-2xl font-bold text-sm hover:bg-surface-200 transition-all"
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all"
                 >
                   Batal
                 </button>
                 <button 
                   onClick={confirmDelete}
                   disabled={actionLoading}
-                  className="flex-1 px-6 py-3.5 bg-red-600 text-white rounded-2xl font-bold text-sm hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all disabled:opacity-50"
+                  className="bg-red-600 text-white hover:bg-red-700 flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-red-600/20 flex items-center justify-center gap-1.5"
                 >
-                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : 'Ya, Hapus Data'}
+                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Ya, Hapus Data'}
                 </button>
               </div>
             </div>
@@ -446,8 +446,8 @@ export default function AdminUsers() {
 
       {/* Add Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white w-full max-w-md h-auto max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in border border-white/20 flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-surface-900/60 backdrop-blur-sm animate-fade-in sm:p-4">
+          <div className="bg-white w-full sm:max-w-md h-auto max-h-[92vh] sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in border border-white/20 flex flex-col">
             <div className="px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-br from-primary-50 to-white border-b border-surface-100 flex items-center gap-4 sticky top-0 z-10 shrink-0">
               <button 
                 onClick={() => setIsAddModalOpen(false)} 
@@ -493,9 +493,19 @@ export default function AdminUsers() {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-6 py-3.5 bg-surface-100 text-surface-600 rounded-2xl font-bold text-sm hover:bg-surface-200 transition-all">Batal</button>
-                <button type="submit" disabled={actionLoading} className="flex-1 px-6 py-3.5 btn-primary shadow-lg shadow-primary-500/20 rounded-2xl font-bold text-sm disabled:opacity-50">
-                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : 'Buat Akun'}
+                <button 
+                  type="button" 
+                  onClick={() => setIsAddModalOpen(false)} 
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={actionLoading} 
+                  className="btn-primary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-primary-500/20"
+                >
+                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Buat Akun'}
                 </button>
               </div>
             </form>

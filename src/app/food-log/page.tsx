@@ -323,15 +323,15 @@ export default function FoodLogPage() {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up">
-            <div className="px-6 py-4 border-b border-surface-100 flex items-center justify-between">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4">
+          <div className="bg-white w-full sm:max-w-md h-auto max-h-[92vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
+            <div className="px-6 py-4 border-b border-surface-100 flex items-center justify-between shrink-0">
               <h2 className="text-lg font-bold text-surface-800">📸 Upload Foto Makanan</h2>
               <button onClick={() => setShowUploadModal(false)} className="p-2 text-surface-400 hover:text-surface-700 rounded-xl">
                 ✕
               </button>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-5 overflow-y-auto">
               {/* Meal type selection */}
               <div>
                 <label className="form-label">Waktu Makan</label>

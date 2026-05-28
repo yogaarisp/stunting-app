@@ -286,8 +286,8 @@ export default function ManageMicrobiota() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-2xl h-auto max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4">
+          <div className="bg-white w-full sm:max-w-2xl h-auto max-h-[92vh] sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up flex flex-col">
             <div className="sticky top-0 bg-white px-6 py-4 border-b border-surface-100 flex items-center gap-4 z-10 shrink-0">
               <button 
                 onClick={() => setIsModalOpen(false)} 
@@ -361,10 +361,21 @@ export default function ManageMicrobiota() {
                 </div>
               </div>
               
-              <div className="pt-6 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Batal</button>
-                <button type="submit" disabled={saving} className="btn-primary" id="btn-simpan-aturan">
-                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              <div className="pt-6 flex justify-end gap-3 w-full sm:w-auto">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="btn-secondary flex-1 sm:flex-initial py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={saving} 
+                  className="btn-primary flex-1 sm:flex-initial py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap" 
+                  id="btn-simpan-aturan"
+                >
+                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   Simpan Aturan
                 </button>
               </div>
