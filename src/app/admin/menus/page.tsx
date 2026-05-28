@@ -271,21 +271,21 @@ export default function ManageMenus() {
                 </div>
               </div>
               
-              <div className="pt-6 flex justify-end gap-3 w-full sm:w-auto">
+              <div className="pt-4 flex gap-3">
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)} 
-                  className="btn-secondary flex-1 sm:flex-initial py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap transition-all"
                 >
                   Batal
                 </button>
                 <button 
                   type="submit" 
                   disabled={saving} 
-                  className="btn-primary flex-1 sm:flex-initial py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                  className="btn-primary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-primary-500/20 flex items-center justify-center gap-1.5"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  Simpan Menu
+                  Simpan
                 </button>
               </div>
             </form>

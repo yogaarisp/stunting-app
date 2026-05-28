@@ -14,7 +14,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       {!isAuthOrLanding && <Sidebar />}
-      <main className={`min-h-screen transition-all duration-700 ease-in-out ${!isAuthOrLanding ? 'lg:ml-72 pb-24 lg:pb-0' : 'ml-0'}`}>
+      <main className={`min-h-screen transition-all duration-700 ease-in-out ${!isAuthOrLanding ? 'md:ml-72 pb-20 md:pb-0' : 'ml-0'}`}>
         {children}
       </main>
       <WhatsAppButton />

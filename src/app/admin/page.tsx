@@ -159,14 +159,14 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-6 lg:p-10 space-y-10 pb-24 max-w-7xl mx-auto">
+    <div className="p-4 md:p-8 lg:p-10 space-y-6 md:space-y-10 pb-24 max-w-7xl mx-auto">
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-fade-in-up">
         <div>
-          <h1 className="text-3xl font-extrabold text-surface-800 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-surface-800 tracking-tight">
             Dashboard <span className="gradient-text">Superadmin</span>
           </h1>
-          <p className="text-surface-500 mt-1">Pantau perkembangan data aplikasi Pelacakan Stunting secara real-time.</p>
+          <p className="text-sm md:text-base text-surface-500 mt-1">Pantau perkembangan data aplikasi Pelacakan Stunting secara real-time.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="px-5 py-3 bg-white border border-surface-200 rounded-2xl shadow-sm hidden sm:flex items-center gap-3">
@@ -179,50 +179,51 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up animate-delay-100">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 animate-fade-in-up animate-delay-100">
         {[
           { label: 'Total Pengguna', value: stats.users, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', desc: 'Akun Terdaftar' },
           { label: 'Anak Terdaftar', value: stats.children, icon: Baby, color: 'text-emerald-600', bg: 'bg-emerald-50', desc: 'Pemantauan Aktif' },
           { label: 'Menu Gizi', value: stats.menus, icon: Utensils, color: 'text-amber-600', bg: 'bg-amber-50', desc: 'Rekomendasi Makanan' },
           { label: 'Artikel Edukasi', value: stats.edukasi, icon: BookOpen, color: 'text-indigo-600', bg: 'bg-indigo-50', desc: 'Materi Literasi' },
         ].map((item, idx) => (
-          <div key={idx} className="glass-card p-6 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
-            <div className="flex justify-between items-start mb-4">
-              <div className={`p-3 rounded-2xl ${item.bg} ${item.color} shadow-sm`}>
-                <item.icon size={24} />
+          <div key={idx} className="glass-card p-4 md:p-6 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+            <div className="flex justify-between items-start mb-3 md:mb-4">
+              <div className={`p-2.5 md:p-3 rounded-xl md:rounded-2xl ${item.bg} ${item.color} shadow-sm`}>
+                <item.icon size={20} className="md:hidden" />
+                <item.icon size={24} className="hidden md:block" />
               </div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <div className="hidden sm:flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                 <ArrowUpRight size={10} />
                 <span>REALTIME</span>
               </div>
             </div>
-            <h3 className="text-3xl font-black text-surface-800 tracking-tight">{item.value.toLocaleString()}</h3>
-            <p className="text-xs font-bold text-surface-400 mt-1 uppercase tracking-widest">{item.label}</p>
-            <p className="text-[10px] text-surface-400 mt-2 font-medium">{item.desc}</p>
+            <h3 className="text-2xl md:text-3xl font-black text-surface-800 tracking-tight">{item.value.toLocaleString()}</h3>
+            <p className="text-[10px] md:text-xs font-bold text-surface-400 mt-1 uppercase tracking-widest">{item.label}</p>
+            <p className="text-[10px] text-surface-400 mt-1 md:mt-2 font-medium hidden sm:block">{item.desc}</p>
           </div>
         ))}
       </div>
 
       {/* Research Group Stats */}
       {(groupStats.groupA > 0 || groupStats.groupB > 0) && (
-        <div className="glass-card p-6 animate-fade-in-up animate-delay-100">
-          <div className="flex items-center gap-3 mb-5">
+        <div className="glass-card p-4 md:p-6 animate-fade-in-up animate-delay-100">
+          <div className="flex items-center gap-3 mb-4 md:mb-5">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
               <Users size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-surface-800">Distribusi Kelompok Penelitian</h2>
-              <p className="text-xs text-surface-500">Pembagian otomatis random A/B (Double Blind)</p>
+              <h2 className="text-base md:text-lg font-bold text-surface-800">Distribusi Kelompok Penelitian</h2>
+              <p className="text-[10px] md:text-xs text-surface-500">Pembagian otomatis random A/B (Double Blind)</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/50 rounded-2xl p-5 text-center">
-              <p className="text-3xl font-black text-blue-700">{groupStats.groupA}</p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/50 rounded-2xl p-4 md:p-5 text-center flex-1">
+              <p className="text-2xl md:text-3xl font-black text-blue-700">{groupStats.groupA}</p>
               <p className="text-sm font-bold text-blue-600 mt-1">Kelompok A</p>
               <p className="text-[10px] text-blue-500 mt-0.5 uppercase tracking-wider font-medium">Mikrobiota</p>
             </div>
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/50 rounded-2xl p-5 text-center">
-              <p className="text-3xl font-black text-emerald-700">{groupStats.groupB}</p>
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/50 rounded-2xl p-4 md:p-5 text-center flex-1">
+              <p className="text-2xl md:text-3xl font-black text-emerald-700">{groupStats.groupB}</p>
               <p className="text-sm font-bold text-emerald-600 mt-1">Kelompok B</p>
               <p className="text-[10px] text-emerald-500 mt-0.5 uppercase tracking-wider font-medium">Standar</p>
             </div>
@@ -249,18 +250,18 @@ export default function AdminDashboard() {
 
       {/* === ANALYTICS SECTION (NEW) === */}
       {stuntingStats.total > 0 && (
-        <div className="glass-card p-6 lg:p-8 animate-fade-in-up animate-delay-150">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="glass-card p-4 md:p-6 lg:p-8 animate-fade-in-up animate-delay-150">
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <BarChart3 size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-surface-800">Ringkasan Statistik Stunting</h2>
-              <p className="text-xs text-surface-500">Distribusi status pertumbuhan seluruh anak terdaftar (Standar WHO)</p>
+              <h2 className="text-base md:text-xl font-bold text-surface-800">Ringkasan Statistik Stunting</h2>
+              <p className="text-[10px] md:text-xs text-surface-500">Distribusi status pertumbuhan seluruh anak terdaftar (Standar WHO)</p>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
             {/* Pie Chart */}
             <div className="flex justify-center">
               <div className="w-64 h-64 relative">
@@ -357,7 +358,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-8 animate-fade-in-up animate-delay-200">
+      <div className="grid md:grid-cols-3 gap-6 md:gap-8 animate-fade-in-up animate-delay-200">
         {/* Main Actions */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xl font-bold text-surface-800 flex items-center gap-2">

@@ -466,14 +466,14 @@ export default function GrafikPage() {
                 <button 
                   type="button" 
                   onClick={() => setIsHistoryModalOpen(false)} 
-                  className="btn-secondary flex-1 py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap transition-all"
                 >
                   Batal
                 </button>
                 <button 
                   type="submit" 
                   disabled={historySaving} 
-                  className="btn-primary flex-1 py-2.5 px-3 text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap"
+                  className="btn-primary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-primary-500/20 flex items-center justify-center gap-1.5"
                 >
                   {historySaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   Simpan

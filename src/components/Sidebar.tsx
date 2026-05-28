@@ -104,22 +104,51 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Overlay */}
+      {/* ===== MOBILE TOP NAVBAR ===== */}
+      <header className="fixed top-0 left-0 right-0 z-40 md:hidden bg-white/90 backdrop-blur-xl border-b border-surface-200/50 shadow-sm">
+        <div className="flex items-center justify-between px-4 h-14">
+          {/* Logo */}
+          <Link href={role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 shadow-md shadow-primary-500/20 overflow-hidden">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                <Baby size={18} className="text-white" />
+              )}
+            </div>
+            <span className="text-base font-bold gradient-text">{brandName}</span>
+          </Link>
+
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={() => setIsOpen(true)}
+            className="flex items-center justify-center w-11 h-11 rounded-xl text-surface-600 hover:bg-surface-100 active:bg-surface-200 transition-colors"
+            aria-label="Buka menu navigasi"
+          >
+            <Menu size={22} strokeWidth={2} />
+          </button>
+        </div>
+      </header>
+
+      {/* Spacer for top navbar so content doesn't hide behind it */}
+      <div className="h-14 md:hidden" />
+
+      {/* ===== OVERLAY ===== */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* ===== SIDEBAR DRAWER ===== */}
       <aside
         className={`
-          flex flex-col fixed top-0 left-0 z-40 h-full w-72
+          flex flex-col fixed top-0 left-0 z-50 h-full w-72
           bg-white/80 backdrop-blur-xl border-r border-white/30
           shadow-2xl shadow-primary-500/5
           transition-transform duration-300 ease-in-out
-          lg:translate-x-0
+          md:translate-x-0 md:z-40
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
@@ -137,7 +166,7 @@ export default function Sidebar() {
             <p className="text-xs text-surface-500 font-medium">Stunting Tracker</p>
           </div>
           <button 
-            className="absolute right-4 lg:hidden p-2 text-surface-400 hover:text-surface-700 bg-surface-50 rounded-lg"
+            className="absolute right-4 md:hidden p-2 text-surface-400 hover:text-surface-700 bg-surface-50 rounded-lg"
             onClick={() => setIsOpen(false)}
           >
             <X size={18} />
@@ -168,7 +197,7 @@ export default function Sidebar() {
                     id={`nav-${link.href.slice(1)}`}
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${isActive
                         ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25'
@@ -196,7 +225,7 @@ export default function Sidebar() {
                     href="/admin"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname === '/admin'
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -212,7 +241,7 @@ export default function Sidebar() {
                     href="/admin/menus"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/menus')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -228,7 +257,7 @@ export default function Sidebar() {
                     href="/admin/users"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/users')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -244,7 +273,7 @@ export default function Sidebar() {
                     href="/admin/children"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/children')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -260,7 +289,7 @@ export default function Sidebar() {
                     href="/admin/edukasi"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/edukasi')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -276,7 +305,7 @@ export default function Sidebar() {
                     href="/admin/microbiota"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/microbiota')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -292,7 +321,7 @@ export default function Sidebar() {
                     href="/admin/settings"
                     onClick={() => setIsOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl
+                      flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl
                       text-sm font-medium transition-all duration-200
                       ${pathname.startsWith('/admin/settings')
                         ? 'bg-gradient-to-r from-surface-700 to-surface-800 text-white shadow-lg shadow-surface-500/25'
@@ -308,7 +337,7 @@ export default function Sidebar() {
                     <Link
                       href="/dashboard"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-surface-500 hover:bg-surface-50 hover:text-primary-600"
+                      className="flex items-center gap-3 px-4 py-3 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-200 text-surface-500 hover:bg-surface-50 hover:text-primary-600"
                     >
                       <BookOpen size={20} />
                       <span>Lihat View User</span>
@@ -321,7 +350,7 @@ export default function Sidebar() {
         </nav>
 
         {/* User & Logout */}
-        <div className="mt-auto p-4 border-t border-surface-200/50 bg-white/50 pb-24 lg:pb-4">
+        <div className="mt-auto p-4 border-t border-surface-200/50 bg-white/50 pb-6 md:pb-4">
           <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-surface-100 shadow-sm">
             <Link 
               href="/profile" 
@@ -340,7 +369,7 @@ export default function Sidebar() {
             <button
               id="btn-logout"
               onClick={handleLogout}
-              className="p-3 text-surface-400 hover:text-danger hover:bg-red-50 rounded-xl transition-all"
+              className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-surface-400 hover:text-danger hover:bg-red-50 rounded-xl transition-all"
               title="Keluar"
             >
               <LogOut size={18} />
@@ -349,13 +378,13 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-surface-200/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] lg:hidden pb-safe">
-        <div className="flex items-center justify-around px-2 py-2">
+      {/* ===== MOBILE BOTTOM NAVIGATION ===== */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-surface-200/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:hidden pb-safe">
+        <div className="flex items-center justify-around px-2 py-1.5">
           {!isLoading && (
             <button
               onClick={() => setIsOpen(true)}
-              className="flex flex-col items-center justify-center py-1 gap-1 transition-colors text-surface-400 hover:text-surface-600"
+              className="flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 transition-colors text-surface-400 hover:text-surface-600"
             >
               <div className="p-1.5 rounded-xl transition-colors bg-transparent">
                 <Menu size={20} strokeWidth={2} />
@@ -377,7 +406,7 @@ export default function Sidebar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex flex-col items-center justify-center py-1 gap-1 transition-colors ${isActive ? 'text-primary-600' : 'text-surface-400 hover:text-surface-600'}`}
+                className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 transition-colors ${isActive ? 'text-primary-600' : 'text-surface-400 hover:text-surface-600'}`}
               >
                 <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-primary-50' : 'bg-transparent'}`}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
@@ -390,6 +419,7 @@ export default function Sidebar() {
           {!isLoading && role === 'admin' && [
             { href: '/admin', label: 'Ringkasan', icon: LayoutDashboard },
             { href: '/admin/users', label: 'Pengguna', icon: Users },
+            { href: '/admin/menus', label: 'Menu', icon: Utensils },
             { href: '/profile', label: 'Profil', icon: UserIcon },
           ].map((link) => {
             const isActive = link.href === '/admin' ? pathname === '/admin' : pathname.startsWith(link.href);
@@ -399,7 +429,7 @@ export default function Sidebar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex flex-col items-center justify-center py-1 gap-1 transition-colors ${isActive ? 'text-surface-800' : 'text-surface-400 hover:text-surface-600'}`}
+                className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 transition-colors ${isActive ? 'text-surface-800' : 'text-surface-400 hover:text-surface-600'}`}
               >
                 <div className={`p-1.5 rounded-xl transition-colors ${isActive ? 'bg-surface-100' : 'bg-transparent'}`}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
