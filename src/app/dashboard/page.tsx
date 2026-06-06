@@ -30,7 +30,6 @@ const badgeIcons: Record<string, typeof Flame> = {
 export default function DashboardPage() {
   const [child, setChild] = useState<Child | null>(null);
   const [history, setHistory] = useState<HistoriPerkembangan[]>([]);
-  const [researchGroup, setResearchGroup] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -38,16 +37,7 @@ export default function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Fetch research group
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('research_group')
-      .eq('id', user.id)
-      .single();
-    
-    if (profile) {
-      setResearchGroup(profile.research_group);
-    }
+
 
     const { data: childData } = await supabase
       .from('children')
@@ -107,7 +97,7 @@ export default function DashboardPage() {
     );
   }
 
-  const analisis = analisisPertumbuhan(child, researchGroup);
+  const analisis = analisisPertumbuhan(child);
   const standar = getStandarForAge(child.umur_bulan, child.jenis_kelamin);
   const lastUpdate = new Date(child.updated_at).toLocaleDateString('id-ID', {
     day: 'numeric',

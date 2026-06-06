@@ -52,7 +52,6 @@ interface CookingGuide {
 
 export default function RekomendasiPage() {
   const [child, setChild] = useState<Child | null>(null);
-  const [researchGroup, setResearchGroup] = useState<string | null>(null);
   const [aiMenus, setAiMenus] = useState<AIGeneratedMenu[]>([]);
   const [databaseMenus, setDatabaseMenus] = useState<any[]>([]);
   const [analisis, setAnalisis] = useState<AnalisisStatus | null>(null);
@@ -72,16 +71,6 @@ export default function RekomendasiPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Fetch profile for research group
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('research_group')
-      .eq('id', user.id)
-      .single();
-
-    if (profile) {
-      setResearchGroup(profile.research_group);
-    }
 
     // Fetch child data
     const { data: childData } = await supabase
@@ -92,7 +81,7 @@ export default function RekomendasiPage() {
 
     if (childData) {
       setChild(childData);
-      const analisisResult = analisisPertumbuhan(childData, profile?.research_group);
+      const analisisResult = analisisPertumbuhan(childData);
       setAnalisis(analisisResult);
       
       // Fetch database menus based on criteria
@@ -171,7 +160,6 @@ export default function RekomendasiPage() {
             has_mikrobiota_data: child.has_mikrobiota_data,
             mikrobiota: child.mikrobiota,
           },
-          researchGroup: researchGroup || 'B',
           analisisResult: {
             bbStatus: analisis.bbStatus,
             tbStatus: analisis.tbStatus,
@@ -201,7 +189,7 @@ export default function RekomendasiPage() {
     } finally {
       setGenerating(false);
     }
-  }, [child, analisis, researchGroup]);
+  }, [child, analisis]);
 
   // Menu generation is now manual — user clicks "Generate Menu" button
 

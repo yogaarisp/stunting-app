@@ -15,7 +15,7 @@ interface MenuRequest {
     has_mikrobiota_data: boolean;
     mikrobiota?: string;
   };
-  researchGroup: string;
+
   analisisResult: {
     bbStatus: string;
     tbStatus: string;
@@ -36,7 +36,7 @@ interface MicrobiotaRule {
 }
 
 function buildMenuPrompt(data: MenuRequest, microbiotaRules: MicrobiotaRule[] = []): string {
-  const { childData, researchGroup, analisisResult } = data;
+  const { childData, analisisResult } = data;
 
   const kebutuhanLabels: Record<string, string> = {
     tinggi_kalori: 'Tinggi Kalori (untuk menaikkan berat badan)',
@@ -63,14 +63,14 @@ DATA ANAK:
     prompt += `\n- ALERGI MAKANAN: ${childData.alergi} (WAJIB dihindari, jangan gunakan bahan ini sama sekali)`;
   }
 
-  // Mikrobiota hanya untuk kelompok A
-  if (researchGroup === 'A' && childData.has_mikrobiota_data && childData.mikrobiota) {
+  // Sertakan data Mikrobiota jika ada
+  if (childData.has_mikrobiota_data && childData.mikrobiota) {
     prompt += `\n- Data Mikrobiota Usus: ${childData.mikrobiota}`;
     prompt += `\n- Berdasarkan data mikrobiota di atas, sesuaikan rekomendasi menu untuk mendukung keseimbangan mikrobiota usus anak.`;
   }
 
   // === KNOWLEDGE BASE: Aturan Referensi Mikrobiota dari Database ===
-  if (researchGroup === 'A' && microbiotaRules.length > 0) {
+  if (microbiotaRules.length > 0) {
     prompt += `\n\n=== KNOWLEDGE BASE MIKROBIOTA (dari Tim Riset) ===`;
     prompt += `\nGunakan aturan berikut sebagai acuan utama dalam menyusun menu. Cocokkan dengan data mikrobiota anak di atas:`;
     microbiotaRules.forEach((rule, idx) => {
@@ -129,8 +129,7 @@ function generateConditionHash(data: MenuRequest): string {
     bb: data.childData.berat_badan,
     tb: data.childData.tinggi_badan,
     alergi: data.childData.alergi || '',
-    mikrobiota: data.researchGroup === 'A' ? data.childData.mikrobiota || '' : '',
-    group: data.researchGroup,
+    mikrobiota: data.childData.mikrobiota || '',
     kategori: data.analisisResult.kategoriRekomendasi.sort(),
   });
   return crypto.createHash('md5').update(key).digest('hex');
@@ -182,12 +181,10 @@ export async function POST(request: NextRequest) {
 
     // Fetch aturan mikrobiota dari database (Knowledge Base dinamis)
     let microbiotaRules: MicrobiotaRule[] = [];
-    if (body.researchGroup === 'A') {
-      const { data: rules } = await supabase
-        .from('microbiota_references')
-        .select('nama_bakteri, makanan_disarankan, makanan_dihindari, penjelasan_medis');
-      microbiotaRules = rules || [];
-    }
+    const { data: rules } = await supabase
+      .from('microbiota_references')
+      .select('nama_bakteri, makanan_disarankan, makanan_dihindari, penjelasan_medis');
+    microbiotaRules = rules || [];
 
     // Generate via Gemini
     const prompt = buildMenuPrompt(body, microbiotaRules);
@@ -197,7 +194,6 @@ export async function POST(request: NextRequest) {
     // Save to cache
     await supabase.from('ai_menu_cache').insert({
       child_id: body.childId,
-      research_group: body.researchGroup,
       condition_hash: conditionHash,
       menus: menus,
     });

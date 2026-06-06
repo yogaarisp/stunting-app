@@ -179,7 +179,7 @@ export interface AnalisisStatus {
  * Menganalisis status pertumbuhan anak berdasarkan standar WHO
  * (Gender-specific dengan analisis BB, TB, dan Lingkar Kepala)
  */
-export function analisisPertumbuhan(child: Child, researchGroup?: string | null): AnalisisStatus {
+export function analisisPertumbuhan(child: Child): AnalisisStatus {
   const gender = child.jenis_kelamin || 'Laki-laki';
   const standar = getStandar(child.umur_bulan, gender);
 
@@ -228,8 +228,8 @@ export function analisisPertumbuhan(child: Child, researchGroup?: string | null)
     pesanList.push('Lingkar kepala anak di bawah standar WHO. Perbanyak makanan kaya DHA dan Zat Besi untuk perkembangan otak.');
   }
 
-  // Rule 4: Mikrobiota — HANYA untuk Kelompok A yang punya data
-  if (researchGroup === 'A' && child.has_mikrobiota_data && child.mikrobiota) {
+  // Rule 4: Mikrobiota (berlaku untuk semua yang punya data)
+  if (child.has_mikrobiota_data && child.mikrobiota) {
     kategoriRekomendasi.push('probiotik');
     pesanList.push('Data mikrobiota tersedia. Makanan probiotik direkomendasikan untuk mendukung kesehatan usus.');
   }

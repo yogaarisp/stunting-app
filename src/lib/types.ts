@@ -5,7 +5,6 @@ export interface Profile {
   phone: string | null;
   address: string | null;
   role: 'admin' | 'user';
-  research_group: 'A' | 'B' | null;
   created_at: string;
   updated_at: string;
 }
