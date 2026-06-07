@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Search, Loader2, ArrowLeft, Users, Mail, Clock, Edit2, Trash2, X, AlertCircle, Shield, User, Plus, Key } from 'lucide-react';
 import Link from 'next/link';
 import { Profile } from '@/lib/types';
-import { adminCreateUser, adminResetPassword } from './actions';
+import { adminCreateUser, adminResetPassword, adminDeleteUser } from './actions';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -119,15 +119,11 @@ export default function AdminUsers() {
     
     setActionLoading(true);
     setError('');
-    const supabase = createClient();
     
-    const { error: deleteError } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', selectedUser.id);
+    const result = await adminDeleteUser(selectedUser.id);
 
-    if (deleteError) {
-      setError(deleteError.message);
+    if (result.error) {
+      setError(result.error);
       setActionLoading(false);
     } else {
       await fetchUsers();

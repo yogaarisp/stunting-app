@@ -108,3 +108,38 @@ export async function adminResetPassword(userId: string, newPassword: string) {
     return { error: 'Terjadi kesalahan sistem: ' + err.message };
   }
 }
+
+export async function adminDeleteUser(userId: string) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return { error: 'Unauthorized: No user session' };
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'admin') {
+      return { error: 'Unauthorized: Only admins can delete users' };
+    }
+
+    const adminClient = createAdminClient();
+    
+    const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId);
+
+    if (deleteError) {
+      return { error: deleteError.message };
+    }
+
+    revalidatePath('/admin/users');
+    return { success: true };
+  } catch (err: any) {
+    console.error('Admin Delete User Error:', err);
+    return { error: 'Terjadi kesalahan sistem: ' + err.message };
+  }
+}

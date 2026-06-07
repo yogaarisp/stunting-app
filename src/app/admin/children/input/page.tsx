@@ -236,7 +236,7 @@ export default function AdminInputChildPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-8 pb-20">
+    <div className="p-6 lg:p-8 space-y-8 min-h-screen pb-20">
       {/* Header */}
       <div className="animate-fade-in-up">
         <Link href="/admin/children" className="text-sm font-medium text-surface-500 hover:text-primary-600 flex items-center gap-1 mb-2">
