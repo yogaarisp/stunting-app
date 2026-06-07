@@ -136,7 +136,7 @@ export default function Sidebar() {
       {/* ===== OVERLAY ===== */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -144,7 +144,7 @@ export default function Sidebar() {
       {/* ===== SIDEBAR DRAWER ===== */}
       <aside
         className={`
-          flex flex-col fixed top-0 left-0 z-[60] h-full w-72
+          flex flex-col fixed top-0 left-0 z-50 h-full w-72
           bg-white/80 backdrop-blur-xl border-r border-white/30
           shadow-2xl shadow-primary-500/5
           transition-transform duration-300 ease-in-out
@@ -350,7 +350,7 @@ export default function Sidebar() {
         </nav>
 
         {/* User & Logout */}
-        <div className="mt-auto p-4 border-t border-surface-200/50 bg-white/50 pb-6 md:pb-4">
+        <div className="mt-auto p-4 border-t border-surface-200/50 bg-white/50 pb-24 md:pb-4">
           <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-surface-100 shadow-sm">
             <Link 
               href="/profile" 
