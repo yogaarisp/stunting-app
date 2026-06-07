@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Search, Loader2, ArrowLeft, Users, Mail, Clock, Edit2, Trash2, X, AlertCircle, Shield, User, Plus } from 'lucide-react';
+import { Search, Loader2, ArrowLeft, Users, Mail, Clock, Edit2, Trash2, X, AlertCircle, Shield, User, Plus, Key } from 'lucide-react';
 import Link from 'next/link';
 import { Profile } from '@/lib/types';
-import { adminCreateUser } from './actions';
+import { adminCreateUser, adminResetPassword } from './actions';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -16,6 +16,7 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,6 +30,10 @@ export default function AdminUsers() {
   const [addEmail, setAddEmail] = useState('');
   const [addPassword, setAddPassword] = useState('');
   const [addRole, setAddRole] = useState<'admin' | 'user'>('user');
+
+  // Reset Password States
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -71,6 +76,14 @@ export default function AdminUsers() {
   const handleDeleteClick = (user: Profile) => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
+    setError('');
+  };
+
+  const handleResetClick = (user: Profile) => {
+    setSelectedUser(user);
+    setResetPassword('');
+    setIsResetModalOpen(true);
+    setResetSuccess(false);
     setError('');
   };
 
@@ -147,6 +160,28 @@ export default function AdminUsers() {
       await fetchUsers();
       setActionLoading(false);
     }
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    if (resetPassword.length < 6) {
+      setError('Password minimal 6 karakter.');
+      return;
+    }
+    
+    setActionLoading(true);
+    setError('');
+    
+    const result = await adminResetPassword(selectedUser.id, resetPassword);
+
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setResetSuccess(true);
+      setResetPassword('');
+    }
+    setActionLoading(false);
   };
 
   if (loading) return (
@@ -226,6 +261,9 @@ export default function AdminUsers() {
                     </div>
                   </div>
                   <div className="flex bg-white shadow-sm border border-surface-100 rounded-xl overflow-hidden shrink-0">
+                    <button onClick={() => handleResetClick(user)} className="p-2 text-amber-600 hover:bg-amber-50 border-r border-surface-100" title="Reset Password">
+                      <Key size={16} />
+                    </button>
                     <button onClick={() => handleEdit(user)} className="p-2 text-blue-600 hover:bg-blue-50 border-r border-surface-100">
                       <Edit2 size={16} />
                     </button>
@@ -309,6 +347,13 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center justify-center gap-2">
+                        <button 
+                          onClick={() => handleResetClick(user)}
+                          className="p-2.5 text-surface-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
+                          title="Reset Password"
+                        >
+                          <Key size={18} />
+                        </button>
                         <button 
                           onClick={() => handleEdit(user)}
                           className="p-2.5 text-surface-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
@@ -439,6 +484,84 @@ export default function AdminUsers() {
                   {actionLoading ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Ya, Hapus Data'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {isResetModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-surface-900/60 backdrop-blur-sm animate-fade-in sm:p-4">
+          <div className="bg-white w-full sm:max-w-md h-auto max-h-[92vh] sm:max-h-[90vh] rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in border border-white/20 flex flex-col">
+            <div className="px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-br from-amber-50 to-white border-b border-surface-100 flex items-center gap-4 sticky top-0 z-10 shrink-0">
+              <button 
+                onClick={() => setIsResetModalOpen(false)} 
+                className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-xl transition-all"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div>
+                <h3 className="text-xl font-extrabold text-surface-800">Reset Password</h3>
+                <p className="text-xs text-surface-500 font-medium">{selectedUser.email}</p>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8 overflow-y-auto">
+              {resetSuccess ? (
+                <div className="text-center py-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600">
+                    <Key size={32} />
+                  </div>
+                  <h4 className="text-lg font-bold text-surface-800 mb-2">Password Berhasil Direset!</h4>
+                  <p className="text-sm text-surface-500 mb-6">Password baru untuk pengguna ini sudah aktif dan dapat langsung digunakan.</p>
+                  <button 
+                    onClick={() => setIsResetModalOpen(false)}
+                    className="btn-primary w-full py-3 rounded-xl text-sm font-bold"
+                  >
+                    Selesai
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleResetSubmit} className="space-y-6">
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold flex items-center gap-3">
+                      <AlertCircle size={20} className="shrink-0" />
+                      <p className="text-xs">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-surface-400 uppercase tracking-widest px-1">Password Baru</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={resetPassword} 
+                      onChange={e => setResetPassword(e.target.value)} 
+                      className="form-input !py-3.5 !px-5" 
+                      placeholder="Minimal 6 karakter" 
+                      minLength={6} 
+                    />
+                    <p className="text-xs text-surface-400 px-1 mt-2">Pengguna bisa langsung login menggunakan password ini.</p>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsResetModalOpen(false)} 
+                      className="btn-secondary flex-1 py-3 rounded-xl font-bold text-sm"
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={actionLoading} 
+                      className="bg-amber-500 text-white hover:bg-amber-600 flex-1 py-3 rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                    >
+                      {actionLoading ? <Loader2 className="animate-spin" size={16} /> : 'Simpan Password'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>

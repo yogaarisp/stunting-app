@@ -70,3 +70,41 @@ export async function adminCreateUser(formData: {
     return { error: 'Terjadi kesalahan sistem: ' + err.message };
   }
 }
+
+export async function adminResetPassword(userId: string, newPassword: string) {
+  try {
+    // 1. Verify that the requester is actually an admin
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return { error: 'Unauthorized: No user session' };
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'admin') {
+      return { error: 'Unauthorized: Only admins can reset passwords' };
+    }
+
+    // 2. Reset the user password using the Admin Client
+    const adminClient = createAdminClient();
+    
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
+      password: newPassword
+    });
+
+    if (updateError) {
+      return { error: updateError.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Admin Reset Password Error:', err);
+    return { error: 'Terjadi kesalahan sistem: ' + err.message };
+  }
+}

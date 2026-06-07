@@ -85,9 +85,19 @@ export default function HomePage() {
     const supabase = createClient();
     
     // Auth Check
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
-        router.push('/dashboard');
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         setChecking(false);
       }

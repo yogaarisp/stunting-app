@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Search, Loader2, ArrowLeft, Baby, Target, Activity } from 'lucide-react';
+import { Search, Loader2, ArrowLeft, Baby, Target, Activity, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Child } from '@/lib/types';
 import { analisisPertumbuhan } from '@/lib/recommendations';
@@ -19,6 +19,12 @@ export default function AdminChildren() {
   const [children, setChildren] = useState<ChildWithParent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Modal States
+  const [selectedChild, setSelectedChild] = useState<ChildWithParent | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchChildren = useCallback(async () => {
     const supabase = createClient();
@@ -50,6 +56,34 @@ export default function AdminChildren() {
     child.nama_anak.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (child.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleDeleteClick = (child: ChildWithParent) => {
+    setSelectedChild(child);
+    setIsDeleteModalOpen(true);
+    setError('');
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedChild) return;
+    
+    setActionLoading(true);
+    setError('');
+    const supabase = createClient();
+    
+    const { error: deleteError } = await supabase
+      .from('children')
+      .delete()
+      .eq('id', selectedChild.id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      setActionLoading(false);
+    } else {
+      await fetchChildren();
+      setIsDeleteModalOpen(false);
+      setActionLoading(false);
+    }
+  };
 
   if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-primary-500" size={32} /></div>;
 
@@ -115,13 +149,23 @@ export default function AdminChildren() {
                         <p className="text-[11px] text-surface-500 mt-0.5">{child.umur_bulan} Bulan</p>
                       </div>
                     </div>
-                    <span className={`badge shrink-0 ${
-                      riskLevel === 'Tinggi' ? 'badge-danger' : 
-                      riskLevel === 'Sedang' ? 'badge-warning' : 'badge-success'
-                    }`}>
-                      {riskLevel === 'Tinggi' ? 'Risiko Tinggi' : 
-                       riskLevel === 'Sedang' ? 'Risiko Sedang' : 'Normal'}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className={`badge shrink-0 ${
+                        riskLevel === 'Tinggi' ? 'badge-danger' : 
+                        riskLevel === 'Sedang' ? 'badge-warning' : 'badge-success'
+                      }`}>
+                        {riskLevel === 'Tinggi' ? 'Risiko Tinggi' : 
+                         riskLevel === 'Sedang' ? 'Risiko Sedang' : 'Normal'}
+                      </span>
+                      <div className="flex bg-white shadow-sm border border-surface-100 rounded-xl overflow-hidden shrink-0">
+                        <Link href={`/admin/children/input?parentId=${child.user_id}`} className="p-2 text-blue-600 hover:bg-blue-50 border-r border-surface-100" title="Edit Data">
+                          <Edit2 size={16} />
+                        </Link>
+                        <button onClick={() => handleDeleteClick(child)} className="p-2 text-red-600 hover:bg-red-50" title="Hapus Data">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-between mt-4 p-3 bg-surface-50 rounded-xl border border-surface-100/50">
@@ -152,6 +196,7 @@ export default function AdminChildren() {
                 <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase">Nama Orang Tua</th>
                 <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase">Fisik Saat Ini</th>
                 <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase">Status Risiko</th>
+                <th className="px-6 py-4 text-xs font-bold text-surface-500 uppercase text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-100">
@@ -198,6 +243,24 @@ export default function AdminChildren() {
                            riskLevel === 'Sedang' ? 'Risiko Sedang' : 'Normal'}
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Link 
+                            href={`/admin/children/input?parentId=${child.user_id}`}
+                            className="p-2.5 text-surface-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                            title="Edit Data"
+                          >
+                            <Edit2 size={18} />
+                          </Link>
+                          <button 
+                            onClick={() => handleDeleteClick(child)}
+                            className="p-2.5 text-surface-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                            title="Hapus Data"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })
@@ -206,6 +269,46 @@ export default function AdminChildren() {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && selectedChild && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-scale-in">
+            <div className="p-10 text-center">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-600">
+                <Trash2 size={40} />
+              </div>
+              <h3 className="text-2xl font-extrabold text-surface-800 mb-2">Hapus Data Anak?</h3>
+              <p className="text-surface-500 mb-8 leading-relaxed">
+                Menghapus <span className="font-bold text-surface-900">{selectedChild.nama_anak}</span> akan menghapus seluruh data fisik dan histori perkembangannya secara permanen.
+              </p>
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold flex items-center gap-3">
+                  <AlertCircle size={20} />
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="btn-secondary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  disabled={actionLoading}
+                  className="bg-red-600 text-white hover:bg-red-700 flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm sm:py-3.5 sm:px-6 whitespace-nowrap transition-all disabled:opacity-50 shadow-lg shadow-red-600/20 flex items-center justify-center gap-1.5"
+                >
+                  {actionLoading ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Ya, Hapus Data'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

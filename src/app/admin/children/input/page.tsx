@@ -102,6 +102,14 @@ export default function AdminInputChildPage() {
 
   useEffect(() => {
     fetchParents();
+    // Check URL parameters for parentId
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const parentId = searchParams.get('parentId');
+      if (parentId) {
+        setSelectedParentId(parentId);
+      }
+    }
   }, [fetchParents]);
 
   useEffect(() => {
