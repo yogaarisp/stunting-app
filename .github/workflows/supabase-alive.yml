@@ -1,0 +1,83 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Ping setiap 2 hari sekali jam 07:00 WIB (00:00 UTC)
+    # Supabase pause setelah 7 hari tidak aktif — ini jauh lebih aman
+    - cron: '0 0 */2 * *'
+  workflow_dispatch: # Bisa di-trigger manual kapan saja dari GitHub Actions
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 🏓 Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          echo "========================================"
+          echo "  NutriTrack - Supabase Keep Alive"
+          echo "  Waktu: $(date '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "========================================"
+
+          # Validasi secrets
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "❌ ERROR: Secret belum di-set!"
+            echo "   Tambahkan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY"
+            echo "   di Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+          echo "✅ Secrets ditemukan"
+          echo "🔗 Target: $SUPABASE_URL"
+          echo ""
+
+          # Ping 1: REST API root
+          echo "📡 Ping 1: REST API..."
+          STATUS_1=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 15 \
+            -X GET "$SUPABASE_URL/rest/v1/" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
+          echo "   → HTTP Status: $STATUS_1"
+
+          # Ping 2: Query tabel settings (ringan, public read)
+          echo "📡 Ping 2: Query tabel settings..."
+          STATUS_2=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 15 \
+            -X GET "$SUPABASE_URL/rest/v1/settings?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
+          echo "   → HTTP Status: $STATUS_2"
+
+          # Ping 3: Query tabel menus (public read)
+          echo "📡 Ping 3: Query tabel menus..."
+          STATUS_3=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 15 \
+            -X GET "$SUPABASE_URL/rest/v1/menus?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
+          echo "   → HTTP Status: $STATUS_3"
+
+          echo ""
+
+          # Cek hasil
+          SUCCESS=0
+          for STATUS in $STATUS_1 $STATUS_2 $STATUS_3; do
+            if [[ "$STATUS" == 2* ]]; then
+              SUCCESS=$((SUCCESS + 1))
+            fi
+          done
+
+          echo "========================================"
+          if [ $SUCCESS -gt 0 ]; then
+            echo "✅ BERHASIL: $SUCCESS/3 ping sukses"
+            echo "   Supabase tetap aktif dan tidak akan di-pause!"
+          else
+            echo "⚠️  WARNING: Semua ping gagal ($STATUS_1, $STATUS_2, $STATUS_3)"
+            echo "   Cek apakah Supabase URL dan API Key masih valid."
+          fi
+          echo "========================================"
